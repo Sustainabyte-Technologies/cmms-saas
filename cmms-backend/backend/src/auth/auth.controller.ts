@@ -3,11 +3,16 @@ import {
   Controller,
   Post,
   Res,
+  Get,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +27,7 @@ export class AuthController {
 
     res.cookie('access_token', result.token, {
       httpOnly: true,
-      secure: false, // production la true
+      secure: false,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -31,6 +36,50 @@ export class AuthController {
       message: result.message,
       organization: result.organization,
       user: result.user,
+    };
+  }
+
+  @Post('login')
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.login(dto);
+
+    res.cookie('access_token', result.token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return {
+      message: result.message,
+      user: result.user,
+    };
+  }
+
+  @Post('logout')
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+
+    return {
+      message: 'Logged out successfully',
+    };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: any) {
+    return {
+      message: 'Authenticated User',
+      user: req.user,
     };
   }
 }

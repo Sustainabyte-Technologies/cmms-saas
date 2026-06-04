@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getNavByRole, APP_NAME } from "@/lib/constants";
 import { useRole, roleConfig } from "@/contexts/role-context";
+import { Logo } from "@/components/logo";
 import {
   LayoutDashboard,
   Server,
@@ -60,7 +61,7 @@ interface AppSidebarProps {
 export function AppSidebar({ className }: AppSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const { role } = useRole();
+  const { role, userName } = useRole();
   
   const navItems = getNavByRole(role);
   const config = roleConfig[role];
@@ -75,14 +76,7 @@ export function AppSidebar({ className }: AppSidebarProps) {
     >
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary">
-            <Wrench className="h-5 w-5 text-sidebar-primary-foreground" />
-          </div>
-          {!collapsed && (
-            <span className="text-lg font-bold text-sidebar-foreground">{APP_NAME}</span>
-          )}
-        </Link>
+        <Logo href="/dashboard" size="md" showSubtitle={!collapsed} />
         <Button
           variant="ghost"
           size="icon"
@@ -135,7 +129,7 @@ export function AppSidebar({ className }: AppSidebarProps) {
           </div>
           {!collapsed && (
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-sidebar-foreground">{config.userName}</p>
+              <p className="truncate text-sm font-medium text-sidebar-foreground">{userName}</p>
               <p className="truncate text-xs text-sidebar-foreground/60">{config.label}</p>
             </div>
           )}

@@ -31,19 +31,27 @@ model Role {
 }
 
 model User {
-  id             String       @id @default(uuid())
+  id             String @id @default(uuid())
   fullName       String
-  email          String       @unique
+  email          String
   passwordHash   String
+  phoneNumber    String?
 
   organizationId String
   roleId         String
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  role           Role         @relation(fields: [roleId], references: [id])
+  createdById    String?
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  role           Role @relation(fields: [roleId], references: [id])
+
+  createdBy      User? @relation("UserCreator", fields: [createdById], references: [id])
+  createdUsers   User[] @relation("UserCreator")
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([email, organizationId])
 
   @@map("users")
 }

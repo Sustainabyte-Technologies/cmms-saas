@@ -4,8 +4,9 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { APP_NAME, NAV_LINKS } from "@/lib/constants";
-import { Wrench, Linkedin, Twitter, Github } from "lucide-react";
+import { APP_NAME, APP_DESCRIPTION, NAV_LINKS } from "@/lib/constants";
+import { Linkedin, Twitter, Github } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 const socialLinks = [
   { icon: Twitter, label: "Twitter", href: "#" },
@@ -62,17 +63,13 @@ export function LandingFooter() {
             transition={{ delay: 0.1 }}
             className="space-y-4"
           >
-            <Link href="/" className="flex items-center gap-2">
-              <motion.div
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary"
-              >
-                <Wrench className="h-5 w-5 text-primary-foreground" />
-              </motion.div>
-              <span className="text-lg font-bold text-foreground">{APP_NAME}</span>
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+            >
+              <Logo href="/" size="md" showSubtitle />
+            </motion.div>
             <p className="text-base text-muted-foreground leading-relaxed">
-              Modern CMMS platform for maintenance excellence. Manage assets, work orders, and inventory from one unified platform.
+              {APP_DESCRIPTION}
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social, index) => (

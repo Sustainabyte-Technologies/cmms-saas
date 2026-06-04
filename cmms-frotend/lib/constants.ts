@@ -1,7 +1,8 @@
 // CMMS Application Constants
 
-export const APP_NAME = "MaintainX Pro";
-export const APP_DESCRIPTION = "Modern CMMS Platform for Maintenance Excellence";
+export const APP_NAME = "Fixbyte";
+export const APP_SUBTITLE = "powered by Sustainabyte Technologies";
+export const APP_DESCRIPTION = "Reliable Assets. Sustainable Operations.";
 
 // Navigation Links
 export const NAV_LINKS = [
@@ -220,6 +221,7 @@ export const MAINTENANCE_MANAGER_NAV: NavItem[] = [
   { name: "Work Orders", href: "/dashboard/work-orders", icon: "ClipboardList" },
   { name: "Assets", href: "/dashboard/assets", icon: "Server" },
   { name: "Preventive Maintenance", href: "/dashboard/preventive", icon: "Calendar" },
+  { name: "Users", href: "/dashboard/users", icon: "Users" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];

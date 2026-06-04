@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
@@ -12,7 +13,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existingUser = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findFirst({
       where: {
         email: dto.adminEmail,
       },
@@ -45,6 +46,7 @@ export class AuthService {
         fullName: dto.adminName,
         email: dto.adminEmail,
         passwordHash: hashedPassword,
+        phoneNumber: dto.phoneNumber,
         organizationId: organization.id,
         roleId: adminRole.id,
       },
@@ -64,6 +66,48 @@ export class AuthService {
       organization,
       user,
       token,
+    };
+  }
+
+  async login(dto: LoginDto) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        email: dto.email,
+      },
+      include: {
+        role: true,
+        organization: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Account not found. Please register first.');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      organizationId: user.organizationId,
+      role: user.role.name,
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    const { passwordHash, ...safeUser } = user;
+
+    return {
+      message: 'Login Successful',
+      token,
+      user: safeUser,
     };
   }
 }

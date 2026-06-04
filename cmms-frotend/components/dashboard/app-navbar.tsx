@@ -10,13 +10,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { getNavByRole, APP_NAME } from "@/lib/constants";
 import { useRole, roleConfig } from "@/contexts/role-context";
 import { UserRole } from "@/types";
+import { logoutUser } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { Logo } from "@/components/logo";
 import {
   Search,
   Bell,
@@ -42,7 +43,6 @@ import {
   Archive,
   FileInput,
   CheckCircle,
-  UserCog,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -70,23 +70,29 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   CheckCircle,
 };
 
-const allRoles: UserRole[] = [
-  "admin",
-  "maintenance_manager",
-  "supervisor",
-  "technician",
-  "inventory_manager",
-  "purchase_manager",
-];
-
 export function AppNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const pathname = usePathname();
-  const { role, setRole, userName, userEmail } = useRole();
+  const router = useRouter();
+  const { role, userName, userEmail } = useRole();
   
   const navItems = getNavByRole(role);
   const config = roleConfig[role];
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logoutUser();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      router.push('/login');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background px-4 lg:px-6">
@@ -100,12 +106,7 @@ export function AppNavbar() {
         </SheetTrigger>
         <SheetContent side="left" className="w-[280px] bg-sidebar p-0">
           <div className="flex h-16 items-center border-b border-sidebar-border px-4">
-            <Link href="/dashboard" className="flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary">
-                <Wrench className="h-5 w-5 text-sidebar-primary-foreground" />
-              </div>
-              <span className="text-lg font-bold text-sidebar-foreground">{APP_NAME}</span>
-            </Link>
+            <Logo href="/dashboard" size="md" showSubtitle />
           </div>
           {/* Role Badge Mobile */}
           <div className="border-b border-sidebar-border px-4 py-3">
@@ -163,27 +164,6 @@ export function AppNavbar() {
 
       {/* Right Section */}
       <div className="flex items-center gap-2">
-        {/* Role Switcher (for demo) */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="hidden gap-2 md:flex">
-              <UserCog className="h-4 w-4" />
-              <span className="max-w-[100px] truncate">{config.label}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Switch Role (Demo)</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup value={role} onValueChange={(value) => setRole(value as UserRole)}>
-              {allRoles.map((r) => (
-                <DropdownMenuRadioItem key={r} value={r}>
-                  {roleConfig[r].label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -249,11 +229,13 @@ export function AppNavbar() {
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/" className="text-destructive focus:text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
-                Log out
-              </Link>
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="text-destructive focus:text-destructive cursor-pointer"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              {isLoggingOut ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

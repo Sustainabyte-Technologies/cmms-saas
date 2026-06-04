@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NAV_LINKS, APP_NAME } from "@/lib/constants";
 import { Menu, Wrench } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 export function LandingNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,15 +21,10 @@ export function LandingNavbar() {
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <motion.div
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary"
-          >
-            <Wrench className="h-5 w-5 text-primary-foreground" />
+        <Link href="/" className="flex items-center gap-3">
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Logo href="/" size="lg" showSubtitle={false} />
           </motion.div>
-          <span className="text-lg font-bold text-foreground">{APP_NAME}</span>
         </Link>
 
         {/* Desktop Navigation */}

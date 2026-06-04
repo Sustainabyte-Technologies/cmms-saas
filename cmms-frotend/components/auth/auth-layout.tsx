@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Wrench } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
+import { Logo } from "@/components/logo";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -13,26 +13,27 @@ export function AuthLayout({ children, title, subtitle, showBackLink = true }: A
   return (
     <div className="flex min-h-screen">
       {/* Left Panel - Branding */}
-      <div className="hidden w-1/2 bg-primary lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-foreground/20">
-            <Wrench className="h-6 w-6 text-primary-foreground" />
+      <div className="hidden w-1/2 bg-gradient-to-br from-[#81C816] to-[#81C816] lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-12">
+        <div className="flex flex-col items-center justify-center space-y-10 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <Logo href="/" size="xl" showSubtitle={false} textColor="white" />
+            <div>
+              <h2 className="text-5xl font-bold text-white">{APP_NAME}</h2>
+              <p className="text-sm text-white/80 mt-2">powered by Sustainabyte Technologies</p>
+            </div>
           </div>
-          <span className="text-2xl font-bold text-primary-foreground">{APP_NAME}</span>
-        </Link>
 
-        <div className="space-y-6">
-          <blockquote className="text-xl font-medium text-primary-foreground/90 leading-relaxed">
-            &ldquo;MaintainX Pro has transformed how we manage our maintenance operations. 
-            The intuitive interface and powerful features have helped us reduce downtime by 40%.&rdquo;
+          <blockquote className="text-lg font-medium text-white/90 leading-relaxed max-w-md border-l-4 border-white/30 pl-6">
+            &ldquo;Fixbyte has transformed how we manage our maintenance operations. The intuitive interface and powerful features have helped us reduce downtime by 40%.&rdquo;
           </blockquote>
+
           <div>
-            <p className="font-semibold text-primary-foreground">Sarah Johnson</p>
-            <p className="text-sm text-primary-foreground/70">Operations Director, Tech Manufacturing Inc.</p>
+            <p className="font-semibold text-white">Sarah Johnson</p>
+            <p className="text-sm text-white/70">Operations Director, Tech Manufacturing Inc.</p>
           </div>
         </div>
 
-        <p className="text-sm text-primary-foreground/60">
+        <p className="absolute bottom-6 text-sm text-white/60">
           &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </p>
       </div>
@@ -42,12 +43,7 @@ export function AuthLayout({ children, title, subtitle, showBackLink = true }: A
         <div className="mx-auto w-full max-w-md">
           {/* Mobile Logo */}
           <div className="mb-8 lg:hidden">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                <Wrench className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-foreground">{APP_NAME}</span>
-            </Link>
+            <Logo href="/" size="lg" showSubtitle />
           </div>
 
           {showBackLink && (

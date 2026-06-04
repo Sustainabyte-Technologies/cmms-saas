@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { Eye, EyeOff } from "lucide-react";
+import { getRoleDashboardRoute } from "@/lib/auth";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,18 +29,50 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     setIsLoading(true);
 
-    // Simulate registration
-    console.log("[v0] Registration attempt:", formData.email);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const response = await fetch(`${apiUrl}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Enable cookies for this request
+        body: JSON.stringify({
+          companyName: formData.companyName,
+          adminName: formData.fullName,
+          adminEmail: formData.email,
+          password: formData.password,
+          phoneNumber: formData.phone,
+        }),
+      });
 
-    setIsLoading(false);
-    router.push("/dashboard");
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.message || "Registration failed");
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      toast.success("Account created successfully!");
+      
+      // Token is automatically stored in cookies via credentials: "include"
+      // No need to manually store it
+      
+      // Redirect to role-specific dashboard
+      const roleRoute = getRoleDashboardRoute(data.role || 'ADMIN');
+      router.push(roleRoute);
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("An error occurred during registration. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { Eye, EyeOff } from "lucide-react";
+import { getRoleDashboardRoute, getDecodedTokenFromCookies } from "@/lib/auth";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,12 +26,53 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login
-    console.log("[v0] Login attempt:", formData.email);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const response = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-    setIsLoading(false);
-    router.push("/dashboard");
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.message || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      toast.success("Login successful!");
+
+      // Use the role from the response data directly
+      if (data.user && data.user.role) {
+        const userRole = data.user.role.name; // e.g., "TECHNICIAN"
+        const roleRoute = getRoleDashboardRoute(userRole);
+        console.log("Redirecting with role:", userRole, "to route:", roleRoute);
+        
+        // Store role in localStorage as backup during navigation
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userRole', userRole);
+          localStorage.setItem('organizationId', data.user.organizationId);
+        }
+        
+        router.push(roleRoute);
+      } else {
+        console.warn("No role found in response, redirecting to dashboard");
+        router.push("/dashboard");
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred during login. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
