@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Organization {
   id   String @id @default(uuid())
   name String
@@ -15,43 +14,281 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users     User[]
+  users             User[]
+  assets            Asset[]             @relation("OrganizationAssets")
+  workOrders        WorkOrder[]
+  ChecklistTemplate ChecklistTemplate[]
 
   @@map("organizations")
 }
 
 model Role {
- id String @id @default(uuid())
-  name        String   @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String?
 
-  users       User[]
+  users User[]
 
   @@map("roles")
 }
 
 model User {
-  id             String @id @default(uuid())
-  fullName       String
-  email          String
-  passwordHash   String
-  phoneNumber    String?
+  id           String  @id @default(uuid())
+  fullName     String
+  email        String
+  passwordHash String
+  phoneNumber  String?
 
   organizationId String
   roleId         String
 
-  createdById    String?
+  createdById String?
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  role           Role @relation(fields: [roleId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  role         Role         @relation(fields: [roleId], references: [id])
 
-  createdBy      User? @relation("UserCreator", fields: [createdById], references: [id])
-  createdUsers   User[] @relation("UserCreator")
+  createdBy     User?   @relation("UserCreator", fields: [createdById], references: [id])
+  createdUsers  User[]  @relation("UserCreator")
+  createdAssets Asset[] @relation("AssetCreatedBy")
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdWorkOrders  WorkOrder[] @relation("WorkOrderCreatedBy")
+  assignedWorkOrders WorkOrder[] @relation("AssignedTechnician")
+
+  workOrderActivities WorkOrderActivity[]
+  workOrderComments   WorkOrderComment[]
+
+  uploadedAttachments WorkOrderAttachment[] @relation("WorkOrderAttachmentUploader")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([email, organizationId])
-
   @@map("users")
+}
+
+enum AssetStatus {
+  ACTIVE
+  UNDER_MAINTENANCE
+  BREAKDOWN
+  IDLE
+  RETIRED
+}
+
+enum WorkOrderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum WorkOrderStatus {
+  OPEN
+  ASSIGNED
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CLOSED
+  REOPENED
+}
+
+enum WorkOrderType {
+  REACTIVE
+  PREVENTIVE
+  BREAKDOWN
+  INSPECTION
+}
+
+model Asset {
+  id String @id @default(uuid())
+
+  assetCode String @unique
+  assetName String
+
+  category String
+
+  imageUrl String?
+
+  status AssetStatus @default(ACTIVE)
+
+  manufacturer String?
+  modelNumber  String?
+  serialNumber String?
+
+  location String
+
+  capacity    String?
+  powerRating String?
+
+  description String?
+
+  organizationId String
+  createdById    String
+
+  organization Organization @relation("OrganizationAssets", fields: [organizationId], references: [id])
+
+  createdBy  User        @relation("AssetCreatedBy", fields: [createdById], references: [id])
+  workOrders WorkOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("assets")
+}
+
+model WorkOrder {
+  id String @id @default(uuid())
+
+  workOrderNumber String @unique
+
+  title       String
+  description String?
+  location    String?
+  category    String?
+
+  priority WorkOrderPriority @default(MEDIUM)
+  status   WorkOrderStatus   @default(OPEN)
+  workType WorkOrderType     @default(REACTIVE)
+
+  estimatedHours Float?
+  actualHours    Float?
+
+  startDate DateTime?
+  dueDate   DateTime?
+
+  breakdownStartedAt DateTime?
+
+  assetRestoredAt DateTime?
+
+  resolutionNotes String?
+
+  organizationId String
+
+  assetId String? // IMPORTANT
+
+  createdById String
+
+  attachments WorkOrderAttachment[]
+
+  assignedTechnicianId String?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  asset Asset? @relation(fields: [assetId], references: [id]) // IMPORTANT
+
+  createdBy User @relation("WorkOrderCreatedBy", fields: [createdById], references: [id])
+
+  assignedTechnician User? @relation("AssignedTechnician", fields: [assignedTechnicianId], references: [id])
+
+  checklistTemplateId String?
+
+  checklistTemplate ChecklistTemplate? @relation(fields: [checklistTemplateId], references: [id])
+
+  activities WorkOrderActivity[]
+  comments   WorkOrderComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("work_orders")
+}
+
+model WorkOrderActivity {
+  id String @id @default(uuid())
+
+  workOrderId String
+
+  action String
+
+  remarks String?
+
+  performedById String
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  performedBy User @relation(fields: [performedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("work_order_activities")
+}
+
+model WorkOrderComment {
+  id String @id @default(uuid())
+
+  workOrderId String
+
+  comment String
+
+  createdById String
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("work_order_comments")
+}
+
+model ChecklistTemplate {
+  id String @id @default(uuid())
+
+  name        String
+  description String?
+
+  organizationId String
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  items ChecklistTemplateItem[]
+
+  workOrders WorkOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("checklist_templates")
+}
+
+model ChecklistTemplateItem {
+  id String @id @default(uuid())
+
+  templateId String
+
+  title String
+
+  isRequired Boolean @default(true)
+
+  sortOrder Int @default(0)
+
+  template ChecklistTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("checklist_template_items")
+}
+
+model WorkOrderAttachment {
+  id String @id @default(uuid())
+
+  workOrderId String
+
+  fileName String
+  fileUrl  String
+  fileType String
+
+  attachmentType String?
+
+  uploadedById String
+
+  createdAt DateTime @default(now())
+
+  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  uploadedBy User @relation("WorkOrderAttachmentUploader", fields: [uploadedById], references: [id])
+
+  @@map("work_order_attachments")
 }

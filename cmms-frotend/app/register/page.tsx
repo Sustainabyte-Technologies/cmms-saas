@@ -63,10 +63,17 @@ export default function RegisterPage() {
       toast.success("Account created successfully!");
       
       // Token is automatically stored in cookies via credentials: "include"
-      // No need to manually store it
+      // Store role and organizationId in localStorage so RoleContext can
+      // read them (httpOnly cookie is not accessible via document.cookie)
+      const userRole = 'ADMIN'; // New registrations are always ADMIN
+      const organizationId = data.organization?.id || data.user?.organizationId || '';
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userRole', userRole);
+        localStorage.setItem('organizationId', organizationId);
+      }
       
       // Redirect to role-specific dashboard
-      const roleRoute = getRoleDashboardRoute(data.role || 'ADMIN');
+      const roleRoute = getRoleDashboardRoute(userRole);
       router.push(roleRoute);
     } catch (error) {
       console.error("Registration error:", error);

@@ -146,7 +146,7 @@ export const PRICING_PLANS = [
 // Testimonials
 export const TESTIMONIALS = [
   {
-    quote: "MaintainX Pro transformed our maintenance operations. We reduced downtime by 40% in the first quarter.",
+    quote: "FixByte transformed our maintenance operations. We reduced downtime by 40% in the first quarter.",
     author: "Sarah Johnson",
     role: "Operations Director",
     company: "Tech Manufacturing Inc.",

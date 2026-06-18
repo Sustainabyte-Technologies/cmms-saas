@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { getNavByRole, APP_NAME } from "@/lib/constants";
 import { useRole, roleConfig } from "@/contexts/role-context";
 import { UserRole } from "@/types";
@@ -19,7 +18,6 @@ import { logoutUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
 import {
-  Search,
   Bell,
   Menu,
   User,
@@ -71,7 +69,6 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export function AppNavbar() {
-  const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const pathname = usePathname();
@@ -105,6 +102,7 @@ export function AppNavbar() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-[280px] bg-sidebar p-0">
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <div className="flex h-16 items-center border-b border-sidebar-border px-4">
             <Logo href="/dashboard" size="md" showSubtitle />
           </div>
@@ -143,23 +141,6 @@ export function AppNavbar() {
 
       {/* Search */}
       <div className="flex flex-1 items-center gap-4">
-        <div className="hidden w-full max-w-md lg:block">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search assets, work orders, inventory..."
-              className="pl-9"
-            />
-          </div>
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden"
-          onClick={() => setSearchOpen(!searchOpen)}
-        >
-          <Search className="h-5 w-5" />
-        </Button>
       </div>
 
       {/* Right Section */}
@@ -220,13 +201,17 @@ export function AppNavbar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/profile" className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/settings" className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
@@ -240,21 +225,6 @@ export function AppNavbar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
-      {/* Mobile Search Overlay */}
-      {searchOpen && (
-        <div className="absolute inset-x-0 top-full border-b border-border bg-background p-4 lg:hidden">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              className="pl-9"
-              autoFocus
-              onBlur={() => setSearchOpen(false)}
-            />
-          </div>
-        </div>
-      )}
     </header>
   );
 }

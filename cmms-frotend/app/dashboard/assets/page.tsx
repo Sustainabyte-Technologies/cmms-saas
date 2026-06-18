@@ -1,24 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/ui-components";
+import { useState, useEffect } from "react";
+import { PageHeader, EmptyState } from "@/components/shared/ui-components";
+import {
+  AssetsTable,
+  CreateAssetDialog,
+  EditAssetDialog,
+  DeleteAssetDialog,
+  ViewAssetDialog,
+} from "@/components/dashboard/assets";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -26,93 +19,192 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Search, Filter, MoreHorizontal, Server, Eye, Edit, Trash2 } from "lucide-react";
-
-// Mock data
-const assets = [
-  {
-    id: "AST-001",
-    name: "CNC Machine #1",
-    code: "CNC-001",
-    category: "Manufacturing",
-    location: "Building A - Floor 1",
-    status: "operational",
-    value: "$125,000",
-  },
-  {
-    id: "AST-002",
-    name: "HVAC Unit #3",
-    code: "HVAC-003",
-    category: "Facilities",
-    location: "Building B - Rooftop",
-    status: "maintenance",
-    value: "$45,000",
-  },
-  {
-    id: "AST-003",
-    name: "Conveyor Belt #7",
-    code: "CONV-007",
-    category: "Manufacturing",
-    location: "Building A - Floor 2",
-    status: "operational",
-    value: "$78,000",
-  },
-  {
-    id: "AST-004",
-    name: "Backup Generator",
-    code: "GEN-001",
-    category: "Facilities",
-    location: "Building C - Basement",
-    status: "repair",
-    value: "$95,000",
-  },
-  {
-    id: "AST-005",
-    name: "Assembly Line A",
-    code: "ASSY-001",
-    category: "Manufacturing",
-    location: "Building A - Floor 1",
-    status: "operational",
-    value: "$250,000",
-  },
-];
-
-const getStatusVariant = (status: string) => {
-  switch (status) {
-    case "operational":
-      return "success";
-    case "maintenance":
-      return "warning";
-    case "repair":
-      return "error";
-    default:
-      return "default";
-  }
-};
+import { Plus, Search, Filter, Server, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { fetchAssets, Asset, deleteAsset } from "@/lib/api/assets-api";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function AssetsPage() {
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const { toast } = useToast();
 
-  const filteredAssets = assets.filter((asset) => {
-    const matchesSearch =
-      asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.code.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || asset.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Fetch assets on mount and when pagination/search changes
+  useEffect(() => {
+    const loadAssets = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("📦 Loading assets...");
+        const response = await fetchAssets(currentPage, rowsPerPage, searchQuery);
+        console.log("✅ Assets loaded:", response);
+        setAssets(response.data);
+        setTotalPages(response.pagination.totalPages);
+        setTotalAssets(response.pagination.total);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to load assets";
+        console.error("❌ Error loading assets:", errorMessage);
+        setError(errorMessage);
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAssets();
+  }, [currentPage, rowsPerPage, searchQuery, toast]);
+
+  // Handle asset view
+  const handleViewAsset = (asset: Asset) => {
+    console.log("👁️ View asset:", asset);
+    setSelectedAssetId(asset.id);
+    setViewDialogOpen(true);
+  };
+
+  // Handle asset edit
+  const handleEditAsset = (asset: Asset) => {
+    console.log("✏️ Edit asset:", asset);
+    setSelectedAsset(asset);
+    setEditDialogOpen(true);
+  };
+
+  // Handle asset delete
+  const handleDeleteAsset = (asset: Asset) => {
+    console.log("🗑️ Delete asset:", asset);
+    setSelectedAsset(asset);
+    setDeleteDialogOpen(true);
+  };
+
+  // Handle asset creation success - reload assets
+  const handleAssetCreated = () => {
+    console.log("✅ Asset created, reloading assets...");
+    setCurrentPage(1);
+    setSearchQuery("");
+  };
+
+  // Handle asset update success - reload assets
+  const handleAssetUpdated = () => {
+    console.log("✅ Asset updated, reloading assets...");
+    // Reload current page to reflect changes
+  };
+
+  // Handle asset deletion success - reload assets
+  const handleAssetDeletedSuccess = () => {
+    console.log("✅ Asset deleted, reloading assets...");
+    // Reload current page or go to first page
+    if (assets.length === 1 && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Skeleton loader component
+  const SkeletonTableRows = () => (
+    <Table>
+      <TableHeader>
+        <TableRow className="bg-muted/50 hover:bg-muted/50">
+          <TableHead className="w-50 text-sm font-semibold text-foreground pl-6">Asset Name</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Code</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Category</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Location</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Status</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Created By</TableHead>
+          <TableHead className="w-20 text-sm font-semibold text-foreground">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <TableRow key={i} className="hover:bg-muted/50">
+            <TableCell className="pl-6">
+              <Skeleton className="h-4 w-[150px]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-[80px]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-[100px]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-[120px]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-6 w-[90px] rounded-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-[110px]" />
+            </TableCell>
+            <TableCell>
+              <div className="flex gap-2">
+                <Skeleton className="h-8 w-8 rounded" />
+                <Skeleton className="h-8 w-8 rounded" />
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Assets"
-        description="Manage and track all your organization&apos;s assets"
+        description="Manage and track all your organization's assets"
       >
-        <Button>
+        <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Add Asset
         </Button>
       </PageHeader>
+
+      {/* Create Asset Dialog */}
+      <CreateAssetDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={handleAssetCreated}
+      />
+
+      {/* View Asset Dialog */}
+      <ViewAssetDialog
+        open={viewDialogOpen}
+        onOpenChange={setViewDialogOpen}
+        assetId={selectedAssetId}
+      />
+
+      {/* Edit Asset Dialog */}
+      <EditAssetDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        asset={selectedAsset}
+        onSuccess={handleAssetUpdated}
+        onDeleted={handleAssetDeletedSuccess}
+      />
+
+      {/* Delete Asset Dialog */}
+      <DeleteAssetDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        asset={selectedAsset}
+        onSuccess={handleAssetDeletedSuccess}
+      />
 
       {/* Filters */}
       <Card>
@@ -121,9 +213,12 @@ export default function AssetsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search assets..."
+                placeholder="Search assets by name or code..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1); // Reset to first page when searching
+                }}
                 className="pl-9"
               />
             </div>
@@ -135,9 +230,11 @@ export default function AssetsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="operational">Operational</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
-                  <SelectItem value="repair">Repair</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="UNDER_MAINTENANCE">Under Maintenance</SelectItem>
+                  <SelectItem value="BREAKDOWN">Breakdown</SelectItem>
+                  <SelectItem value="IDLE">Idle</SelectItem>
+                  <SelectItem value="RETIRED">Retired</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -148,74 +245,84 @@ export default function AssetsPage() {
       {/* Assets Table */}
       <Card>
         <CardContent className="p-0">
-          {filteredAssets.length === 0 ? (
+          {error && (
+            <div className="p-6 border-b border-red-200 bg-red-50">
+              <div className="flex items-center gap-3 text-red-800">
+                <AlertCircle className="h-5 w-5" />
+                <div>
+                  <p className="font-semibold">Error loading assets</p>
+                  <p className="text-sm">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {loading ? (
+            <SkeletonTableRows />
+          ) : assets.length === 0 ? (
             <EmptyState
               title="No assets found"
-              description="Try adjusting your search or filter criteria"
+              description={
+                searchQuery
+                  ? "Try adjusting your search criteria"
+                  : "No assets have been created yet"
+              }
               icon={Server}
             />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Asset</TableHead>
-                  <TableHead className="hidden md:table-cell">Category</TableHead>
-                  <TableHead className="hidden lg:table-cell">Location</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden sm:table-cell">Value</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAssets.map((asset) => (
-                  <TableRow key={asset.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                          <Server className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{asset.name}</p>
-                          <p className="text-xs text-muted-foreground">{asset.code}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-muted-foreground">
-                      {asset.category}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-muted-foreground">
-                      {asset.location}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={asset.status} variant={getStatusVariant(asset.status)} />
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell text-muted-foreground">
-                      {asset.value}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" /> View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <>
+              <div className="overflow-x-auto">
+                <AssetsTable
+                  data={assets}
+                  onView={handleViewAsset}
+                  onEdit={handleEditAsset}
+                  onDelete={handleDeleteAsset}
+                  caption={`Showing ${(currentPage - 1) * rowsPerPage + 1} - ${Math.min(currentPage * rowsPerPage, totalAssets)} of ${totalAssets} assets`}
+                />
+              </div>
+              
+              {/* Pagination Controls */}
+              <div className="flex items-center justify-between border-t border-border px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Rows per page:</span>
+                  <select
+                    value={rowsPerPage}
+                    onChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="rounded border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value={10}>10</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+
+                <div className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

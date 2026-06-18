@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Query,
   Post,
   Patch,
   Delete,
@@ -23,7 +24,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   @Post()
   @Roles('ADMIN', 'MAINTENANCE_MANAGER')
@@ -38,19 +39,30 @@ export class UsersController {
       req.user.role,
     );
   }
-
   @Get()
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER')
-  async getUsers(@Req() req: any) {
+  @Roles('ADMIN', 'MAINTENANCE_MANAGER', 'SUPERVISOR')
+  async getUsers(
+    @Req() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+  ) {
     return this.usersService.getUsers(
       req.user.organizationId,
       req.user.role,
       req.user.sub,
+      {
+        page: Number(page) || 1,
+        limit: Number(limit) || 10,
+        search,
+        role,
+      },
     );
   }
 
   @Get(':id')
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER')
+  @Roles('ADMIN', 'MAINTENANCE_MANAGER', 'SUPERVISOR')
   async getUserById(
     @Param('id') id: string,
     @Req() req: any,
@@ -90,6 +102,19 @@ export class UsersController {
       req.user.organizationId,
       req.user.role,
       req.user.sub,
+    );
+  }
+  @Get('technicians/workload')
+  @Roles(
+    'ADMIN',
+    'MAINTENANCE_MANAGER',
+    'SUPERVISOR',
+  )
+  async getTechnicianWorkload(
+    @Req() req: any,
+  ) {
+    return this.usersService.getTechnicianWorkload(
+      req.user.organizationId,
     );
   }
 }

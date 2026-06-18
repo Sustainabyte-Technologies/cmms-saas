@@ -1,6 +1,11 @@
 "use client";
 
-import { DashboardCard, PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { DashboardOverviewCards } from "@/components/dashboard/dashboard-overview-cards";
+import { WorkOrderStatusChart } from "@/components/dashboard/work-order-status-chart";
+import { UserRoleDistributionChart } from "@/components/dashboard/user-role-distribution-chart";
+import { TechnicianWorkloadChart } from "@/components/dashboard/technician-workload-chart";
+import { RecentActivitiesTable } from "@/components/dashboard/recent-activities-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,35 +90,7 @@ export function AdminDashboard() {
       </PageHeader>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard
-          title="Total Assets"
-          value="1,284"
-          icon={Server}
-          trend={{ value: 12, isPositive: true }}
-          description="from last month"
-        />
-        <DashboardCard
-          title="Open Work Orders"
-          value="23"
-          icon={ClipboardList}
-          trend={{ value: 8, isPositive: false }}
-          description="from last week"
-        />
-        <DashboardCard
-          title="Active Users"
-          value="72"
-          icon={Users}
-          trend={{ value: 5, isPositive: true }}
-          description="from last month"
-        />
-        <DashboardCard
-          title="Pending Approvals"
-          value="8"
-          icon={Shield}
-          description="requires attention"
-        />
-      </div>
+      <DashboardOverviewCards />
 
       {/* Charts Row */}
       <div className="grid gap-6 lg:grid-cols-2">
@@ -148,53 +125,15 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Role Distribution */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-semibold">User Role Distribution</CardTitle>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/users" className="text-xs">
-                Manage Users <ArrowUpRight className="ml-1 h-3 w-3" />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="flex h-[280px] items-center justify-center">
-              <div className="flex items-center gap-8">
-                <div className="h-[200px] w-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={roleDistribution}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={4}
-                        dataKey="value"
-                      >
-                        {roleDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-3">
-                  {roleDistribution.map((item) => (
-                    <div key={item.name} className="flex items-center gap-3">
-                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="text-sm text-muted-foreground">{item.name}</span>
-                      <span className="font-semibold">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* User Role Distribution */}
+        <UserRoleDistributionChart />
       </div>
+
+      {/* Work Order Status */}
+      <WorkOrderStatusChart />
+
+      {/* Technician Workload */}
+      <TechnicianWorkloadChart />
 
       {/* Tables Row */}
       <div className="grid gap-6 lg:grid-cols-2">
@@ -300,6 +239,12 @@ export function AdminDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* User Role Distribution */}
+      <UserRoleDistributionChart />
+
+      {/* Recent Activities */}
+      <RecentActivitiesTable />
     </div>
   );
 }

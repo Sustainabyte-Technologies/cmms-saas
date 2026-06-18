@@ -1,6 +1,11 @@
 "use client";
 
-import { DashboardCard, PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { DashboardOverviewCards } from "@/components/dashboard/dashboard-overview-cards";
+import { WorkOrderStatusChart } from "@/components/dashboard/work-order-status-chart";
+import { UserRoleDistributionChart } from "@/components/dashboard/user-role-distribution-chart";
+import { TechnicianWorkloadChart } from "@/components/dashboard/technician-workload-chart";
+import { RecentActivitiesTable } from "@/components/dashboard/recent-activities-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -87,34 +92,10 @@ export function TechnicianDashboard() {
       </PageHeader>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard
-          title="My Active Tasks"
-          value="3"
-          icon={CheckSquare}
-          description="assigned to you"
-        />
-        <DashboardCard
-          title="Completed Today"
-          value="2"
-          icon={CheckCircle}
-          trend={{ value: 1, isPositive: true }}
-          description="from yesterday"
-        />
-        <DashboardCard
-          title="Avg. Completion Time"
-          value="1.8h"
-          icon={Clock}
-          trend={{ value: 10, isPositive: true }}
-          description="below average"
-        />
-        <DashboardCard
-          title="This Week"
-          value="12"
-          icon={Wrench}
-          description="tasks completed"
-        />
-      </div>
+      <DashboardOverviewCards />
+
+      {/* Work Order Status */}
+      <WorkOrderStatusChart />
 
       {/* Current Tasks */}
       <div className="space-y-4">
@@ -196,6 +177,7 @@ export function TechnicianDashboard() {
       </div>
 
       {/* Recently Completed */}
+      
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -252,6 +234,15 @@ export function TechnicianDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* User Role Distribution */}
+      <UserRoleDistributionChart />
+
+      {/* Technician Workload */}
+      <TechnicianWorkloadChart />
+
+      {/* Recent Activities */}
+      <RecentActivitiesTable />
     </div>
   );
 }

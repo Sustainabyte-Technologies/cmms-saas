@@ -1,6 +1,11 @@
 "use client";
 
-import { DashboardCard, PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { DashboardOverviewCards } from "@/components/dashboard/dashboard-overview-cards";
+import { WorkOrderStatusChart } from "@/components/dashboard/work-order-status-chart";
+import { UserRoleDistributionChart } from "@/components/dashboard/user-role-distribution-chart";
+import { TechnicianWorkloadChart } from "@/components/dashboard/technician-workload-chart";
+import { RecentActivitiesTable } from "@/components/dashboard/recent-activities-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -117,34 +122,7 @@ export function PurchaseManagerDashboard() {
       </PageHeader>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard
-          title="Pending Requests"
-          value="8"
-          icon={FileInput}
-          description="awaiting approval"
-        />
-        <DashboardCard
-          title="Open POs"
-          value="12"
-          icon={ShoppingCart}
-          trend={{ value: 3, isPositive: true }}
-          description="from last week"
-        />
-        <DashboardCard
-          title="This Month Spend"
-          value="$67,500"
-          icon={DollarSign}
-          trend={{ value: 8, isPositive: false }}
-          description="vs budget"
-        />
-        <DashboardCard
-          title="Active Vendors"
-          value="24"
-          icon={Building2}
-          description="registered vendors"
-        />
-      </div>
+      <DashboardOverviewCards />
 
       {/* Charts Row */}
       <div className="grid gap-6 lg:grid-cols-2">
@@ -255,6 +233,9 @@ export function PurchaseManagerDashboard() {
         </CardContent>
       </Card>
 
+      {/* Work Order Status */}
+      <WorkOrderStatusChart />
+
       {/* Tables Row */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent POs */}
@@ -335,6 +316,15 @@ export function PurchaseManagerDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* User Role Distribution */}
+      <UserRoleDistributionChart />
+
+      {/* Technician Workload */}
+      <TechnicianWorkloadChart />
+
+      {/* Recent Activities */}
+      <RecentActivitiesTable />
     </div>
   );
 }

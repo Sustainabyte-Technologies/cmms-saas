@@ -5,6 +5,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role, WorkOrderStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -87,31 +88,98 @@ export class UsersService {
         organizationId: string,
         currentUserRole: string,
         currentUserId: string,
+        query: {
+            page: number;
+            limit: number;
+            search?: string;
+            role?: string;
+        },
     ) {
-        return this.prisma.user.findMany({
-            where: {
-                organizationId,
-                role: {
-                    name: {
-                        not: 'ADMIN',
-                    },
+        const {
+            page,
+            limit,
+            search,
+            role,
+        } = query;
+
+        const skip = (page - 1) * limit;
+
+        const where: any = {
+            organizationId,
+
+            role: {
+                name: {
+                    not: 'ADMIN',
                 },
             },
-            include: {
-                role: true,
-                createdBy: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                        role: true,
+        };
+
+        if (search) {
+            where.OR = [
+                {
+                    fullName: {
+                        contains: search,
+                        mode: 'insensitive',
                     },
                 },
+                {
+                    email: {
+                        contains: search,
+                        mode: 'insensitive',
+                    },
+                },
+            ];
+        }
+
+        if (role) {
+            where.role = {
+                name: role,
+            };
+        }
+
+        const total =
+            await this.prisma.user.count({
+                where,
+            });
+
+        const users =
+            await this.prisma.user.findMany({
+                where,
+
+                include: {
+                    role: true,
+
+                    createdBy: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            email: true,
+                            role: true,
+                        },
+                    },
+                },
+
+                orderBy: {
+                    createdAt: 'desc',
+                },
+
+                skip,
+                take: limit,
+            });
+
+        return {
+            data: users,
+
+            pagination: {
+                total,
+                page,
+                limit,
+
+                totalPages: Math.ceil(
+                    total / limit,
+                ),
             },
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
+        };
     }
 
     async getUserById(
@@ -194,6 +262,11 @@ export class UsersService {
             roleId = role.id;
         }
 
+        let passwordHash: string | undefined;
+        if (dto.password) {
+            passwordHash = await bcrypt.hash(dto.password, 10);
+        }
+
         return this.prisma.user.update({
             where: {
                 id,
@@ -203,6 +276,7 @@ export class UsersService {
                 email: dto.email,
                 phoneNumber: dto.phoneNumber,
                 roleId,
+                ...(passwordHash ? { passwordHash } : {}),
             },
             include: {
                 role: true,
@@ -247,5 +321,52 @@ export class UsersService {
         return {
             message: 'User deleted successfully',
         };
+    }
+    async getTechnicianWorkload(
+        organizationId: string,
+    ) {
+        const technicians = await this.prisma.user.findMany({
+            where: {
+                organizationId,
+                role: {
+                    is: {
+                        name: 'TECHNICIAN',
+                    },
+                },
+            },
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+            },
+        });
+
+        const workload = await Promise.all(
+            technicians.map(async (tech) => {
+                const activeWorkOrders =
+                    await this.prisma.workOrder.count({
+                        where: {
+                            assignedTechnicianId: tech.id,
+                            status: {
+                                in: [
+                                    WorkOrderStatus.OPEN,
+                                    WorkOrderStatus.ASSIGNED,
+                                    WorkOrderStatus.IN_PROGRESS,
+                                    WorkOrderStatus.ON_HOLD,
+                                ],
+                            },
+                        },
+                    });
+
+                return {
+                    id: tech.id,
+                    name: tech.fullName,
+                    email: tech.email,
+                    activeWorkOrders,
+                };
+            }),
+        );
+
+        return workload;
     }
 }

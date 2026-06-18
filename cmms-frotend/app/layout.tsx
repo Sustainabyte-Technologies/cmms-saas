@@ -4,19 +4,19 @@ import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
-const poppins = Poppins({ 
+const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
-  title: 'MaintainX Pro - Modern CMMS Platform for Maintenance Excellence',
+  title: 'FixByte - Modern CMMS Platform for Maintenance Excellence',
   description: 'Manage assets, work orders, preventive maintenance, inventory, and purchasing from one unified platform. Streamline your maintenance operations and reduce downtime.',
   keywords: ['CMMS', 'maintenance management', 'asset management', 'work orders', 'preventive maintenance', 'inventory management'],
-  authors: [{ name: 'MaintainX Pro' }],
+  authors: [{ name: 'FixByte' }],
   openGraph: {
-    title: 'MaintainX Pro - Modern CMMS Platform',
+    title: 'FixByte - Modern CMMS Platform',
     description: 'Manage assets, work orders, preventive maintenance, inventory, and purchasing from one unified platform.',
     type: 'website',
   },

@@ -1,6 +1,11 @@
 "use client";
 
-import { DashboardCard, PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { DashboardOverviewCards } from "@/components/dashboard/dashboard-overview-cards";
+import { WorkOrderStatusChart } from "@/components/dashboard/work-order-status-chart";
+import { UserRoleDistributionChart } from "@/components/dashboard/user-role-distribution-chart";
+import { TechnicianWorkloadChart } from "@/components/dashboard/technician-workload-chart";
+import { RecentActivitiesTable } from "@/components/dashboard/recent-activities-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -79,35 +84,7 @@ export function SupervisorDashboard() {
       </PageHeader>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <DashboardCard
-          title="Team Members"
-          value="4"
-          icon={Users}
-          description="active today"
-        />
-        <DashboardCard
-          title="Active Work Orders"
-          value="12"
-          icon={ClipboardList}
-          trend={{ value: 2, isPositive: false }}
-          description="from yesterday"
-        />
-        <DashboardCard
-          title="Completed Today"
-          value="8"
-          icon={CheckCircle}
-          trend={{ value: 25, isPositive: true }}
-          description="above target"
-        />
-        <DashboardCard
-          title="Avg. Completion Time"
-          value="2.4h"
-          icon={Clock}
-          trend={{ value: 15, isPositive: true }}
-          description="faster"
-        />
-      </div>
+      <DashboardOverviewCards />
 
       {/* Team Workload Chart */}
       <Card>
@@ -140,6 +117,15 @@ export function SupervisorDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Charts Row - Work Order Status & User Role Distribution */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <WorkOrderStatusChart />
+        <UserRoleDistributionChart />
+      </div>
+
+      {/* Technician Workload */}
+      <TechnicianWorkloadChart />
 
       {/* Tables Row */}
       <div className="grid gap-6 lg:grid-cols-2">
@@ -250,6 +236,9 @@ export function SupervisorDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Recent Activities */}
+      <RecentActivitiesTable />
     </div>
   );
 }

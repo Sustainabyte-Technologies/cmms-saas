@@ -1,8 +1,8 @@
 import { FeaturesSection } from "@/components/landing/features-section";
 
 export const metadata = {
-  title: "Features | MaintainX Pro",
-  description: "Discover all the powerful features of MaintainX Pro CMMS platform.",
+  title: "Features | FixByte",
+  description: "Discover all the powerful features of FixByte CMMS platform.",
 };
 
 export default function FeaturesPage() {
