@@ -4,8 +4,9 @@ import { WorkOrdersService } from './work-orders.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { WorkOrderGateway } from './work-order.gateway';
 import { AzureModule } from '../azure/azure.module';
+import { WorkOrderChatModule } from '../work-order-chat/work-order-chat.module';
 @Module({
-  imports: [PrismaModule, AzureModule],
+  imports: [PrismaModule, AzureModule, WorkOrderChatModule],
   controllers: [WorkOrdersController],
   providers: [WorkOrdersService, WorkOrderGateway],
 })

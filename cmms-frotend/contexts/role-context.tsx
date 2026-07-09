@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { UserRole } from "@/types";
 import { getDecodedTokenFromCookies, normalizeRole, getUserFromToken } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/api/users-api";
 
 interface UserData {
   id: string;
@@ -33,11 +34,17 @@ export const roleConfig: Record<UserRole, {
     description: "Full system oversight and user management",
     initials: "AD",
   },
-  maintenance_manager: {
-    label: "Maintenance Manager",
-    dashboardTitle: "Maintenance Manager Dashboard",
-    description: "Oversee maintenance operations and team performance",
-    initials: "MM",
+  customer_manager: {
+    label: "Customer Manager",
+    dashboardTitle: "Customer Manager Dashboard",
+    description: "Oversee customer/organization operations and team performance",
+    initials: "CM",
+  },
+  site_incharge: {
+    label: "Site In-Charge",
+    dashboardTitle: "Site In-Charge Dashboard",
+    description: "Manage operations at your assigned site",
+    initials: "SI",
   },
   supervisor: {
     label: "Supervisor",
@@ -70,29 +77,26 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadRoleFromToken = () => {
-    // Try localStorage first (set during login)
-    if (typeof window !== 'undefined') {
-      const storedRole = localStorage.getItem('userRole');
-      if (storedRole) {
-        console.log("Role found in localStorage:", storedRole);
-        const normalizedRole = normalizeRole(storedRole) as UserRole;
+  const loadRoleFromToken = async () => {
+    try {
+      const authUser = await getAuthenticatedUser();
+      if (authUser) {
+        console.log("Authenticated user found via API:", authUser);
+        const normalizedRole = normalizeRole(authUser.role) as UserRole;
         setRole(normalizedRole);
-        
-        const organizationId = localStorage.getItem('organizationId');
-        if (organizationId) {
-          setUserData({
-            id: '',
-            email: '',
-            organizationId,
-          });
-        }
+        setUserData({
+          id: authUser.sub || (authUser as any).id || '',
+          email: authUser.email,
+          organizationId: authUser.organizationId,
+        });
         setIsLoading(false);
         return;
       }
+    } catch (err) {
+      console.warn("Failed to fetch authenticated user via API, falling back to localStorage/cookies:", err);
     }
 
-    // Fall back to decoding token from cookies
+    // Prioritize decoding token from cookies (which has complete user ID, email, etc.)
     const decodedToken = getDecodedTokenFromCookies();
     
     if (decodedToken) {
@@ -106,12 +110,36 @@ export function RoleProvider({ children }: { children: ReactNode }) {
         email: user.email,
         organizationId: user.organizationId,
       });
-    } else {
-      console.warn("No token found in cookies, defaulting to admin");
-      setRole("admin");
-      setUserData(null);
+      setIsLoading(false);
+      return;
     }
-    
+
+    // Fall back to localStorage (legacy/backup)
+    if (typeof window !== 'undefined') {
+      const storedRole = localStorage.getItem('userRole');
+      if (storedRole) {
+        console.log("Role found in localStorage:", storedRole);
+        const normalizedRole = normalizeRole(storedRole) as UserRole;
+        setRole(normalizedRole);
+        
+        const organizationId = localStorage.getItem('organizationId');
+        const userId = localStorage.getItem('userId');
+        const userEmail = localStorage.getItem('userEmail');
+        if (organizationId) {
+          setUserData({
+            id: userId || '',
+            email: userEmail || '',
+            organizationId,
+          });
+        }
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    console.warn("No token found in cookies, defaulting to admin");
+    setRole("admin");
+    setUserData(null);
     setIsLoading(false);
   };
 

@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AssetsController } from './assets.controller';
 import { AssetsService } from './assets.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaModule } from '../prisma/prisma.module';
 import { AzureModule } from '../azure/azure.module';
 
 @Module({
-  imports: [AzureModule],
+  imports: [AzureModule, PrismaModule],
   controllers: [AssetsController],
   providers: [
     AssetsService,
-    PrismaService,
   ],
 })
 export class AssetsModule {}

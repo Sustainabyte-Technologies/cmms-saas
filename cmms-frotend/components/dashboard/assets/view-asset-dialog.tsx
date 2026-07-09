@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { fetchAssetById, Asset } from "@/lib/api/assets-api";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import { 
   Loader2, 
   AlertCircle, 
@@ -23,7 +24,9 @@ import {
   User, 
   Mail, 
   Info,
-  Layers
+  Layers,
+  QrCode,
+  Download
 } from "lucide-react";
 
 interface ViewAssetDialogProps {
@@ -58,6 +61,33 @@ export function ViewAssetDialog({
   const [asset, setAsset] = useState<Asset | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleDownloadQRCode = async (assetName: string, qrCodeUrl: string) => {
+    try {
+      const response = await fetch(qrCodeUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `${assetName.replace(/\s+/g, "_")}_QR.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+      
+      toast({
+        title: "Success",
+        description: "QR Code downloaded successfully",
+      });
+    } catch (error) {
+      console.error("Failed to download QR code", error);
+      toast({
+        title: "Error",
+        description: "Failed to download QR code image",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const loadAsset = async () => {
@@ -250,6 +280,40 @@ export function ViewAssetDialog({
                       <p className="text-xs text-muted-foreground font-medium">No image attached</p>
                     </div>
                   )}
+                </div>
+
+                {/* Asset QR Code */}
+                <div className="rounded-xl border bg-card p-5 space-y-4 shadow-xs">
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                    <QrCode className="h-3.5 w-3.5 text-primary" /> Asset QR Code
+                  </h4>
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="bg-white p-2.5 rounded-xl border">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(
+                          `${typeof window !== "undefined" ? window.location.origin : ""}/dashboard/assets?assetId=${asset.id}`
+                        )}`}
+                        alt="Asset QR Code"
+                        className="w-36 h-36"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs font-semibold"
+                      onClick={() =>
+                        handleDownloadQRCode(
+                          asset.assetName,
+                          `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+                            `${typeof window !== "undefined" ? window.location.origin : ""}/dashboard/assets?assetId=${asset.id}`
+                          )}`
+                        )
+                      }
+                    >
+                      <Download className="h-3.5 w-3.5 mr-1.5" /> Download QR
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Meta details card */}

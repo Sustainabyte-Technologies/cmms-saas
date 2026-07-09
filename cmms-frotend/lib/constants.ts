@@ -201,12 +201,24 @@ type NavItem = {
 // Admin Navigation - Full access
 export const ADMIN_NAV: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
+  { name: "Portfolio Explorer", href: "/dashboard/portfolio", icon: "Building2" },
+  { name: "Portfolio Setup", href: "/dashboard/portfolio/setup", icon: "Settings" },
   { name: "User Management", href: "/dashboard/users", icon: "Users" },
+  { name: "Chat", href: "/dashboard/chat", icon: "MessageSquare" },
   { name: "Role Management", href: "/dashboard/roles", icon: "Shield" },
   { name: "Assets", href: "/dashboard/assets", icon: "Server" },
   { name: "Work Orders", href: "/dashboard/work-orders", icon: "ClipboardList" },
-  { name: "Preventive Maintenance", href: "/dashboard/preventive", icon: "Calendar" },
-  { name: "Inventory", href: "/dashboard/inventory", icon: "Package" },
+  { name: "PM Dashboard", href: "/dashboard/preventive?view=dashboard", icon: "LayoutDashboard" },
+  { name: "PM Schedules", href: "/dashboard/preventive?view=schedules", icon: "ClipboardList" },
+  { name: "PM Calendar", href: "/dashboard/preventive?view=calendar", icon: "Calendar" },
+  { name: "Inventory Dashboard", href: "/dashboard/inventory", icon: "LayoutDashboard" },
+  { name: "Spare Parts", href: "/dashboard/inventory/spare-parts", icon: "Wrench" },
+  { name: "Categories", href: "/dashboard/inventory/categories", icon: "Layers" },
+  { name: "Warehouses", href: "/dashboard/inventory/warehouses", icon: "Building2" },
+  { name: "Current Stock", href: "/dashboard/inventory/stock", icon: "Archive" },
+  { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
+  { name: "Stock Transactions", href: "/dashboard/inventory/transactions", icon: "History" },
+  { name: "Low Stock Alert", href: "/dashboard/inventory/low-stock", icon: "AlertTriangle" },
   { name: "Purchase", href: "/dashboard/purchase", icon: "ShoppingCart" },
   { name: "Vendors", href: "/dashboard/vendors", icon: "Building2" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
@@ -214,24 +226,58 @@ export const ADMIN_NAV: NavItem[] = [
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];
 
-// Maintenance Manager Navigation
-export const MAINTENANCE_MANAGER_NAV: NavItem[] = [
+// Customer Manager Navigation
+export const CUSTOMER_MANAGER_NAV: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
+  { name: "Portfolio Explorer", href: "/dashboard/portfolio", icon: "Building2" },
+  { name: "Portfolio Setup", href: "/dashboard/portfolio/setup", icon: "Settings" },
   { name: "Maintenance Planning", href: "/dashboard/maintenance-planning", icon: "CalendarClock" },
-  { name: "Work Orders", href: "/dashboard/work-orders", icon: "ClipboardList" },
   { name: "Assets", href: "/dashboard/assets", icon: "Server" },
-  { name: "Preventive Maintenance", href: "/dashboard/preventive", icon: "Calendar" },
+  { name: "Work Orders", href: "/dashboard/work-orders", icon: "ClipboardList" },
+  { name: "PM Dashboard", href: "/dashboard/preventive?view=dashboard", icon: "LayoutDashboard" },
+  { name: "PM Schedules", href: "/dashboard/preventive?view=schedules", icon: "ClipboardList" },
+  { name: "PM Calendar", href: "/dashboard/preventive?view=calendar", icon: "Calendar" },
+  { name: "Inventory Dashboard", href: "/dashboard/inventory", icon: "LayoutDashboard" },
+  { name: "Spare Parts", href: "/dashboard/inventory/spare-parts", icon: "Wrench" },
+  { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
   { name: "Users", href: "/dashboard/users", icon: "Users" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];
 
+export const MAINTENANCE_MANAGER_NAV = CUSTOMER_MANAGER_NAV;
+
+// Site In-Charge Navigation
+export const SITE_INCHARGE_NAV: NavItem[] = [
+  { name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
+  { name: "Portfolio Explorer", href: "/dashboard/portfolio", icon: "Building2" },
+  { name: "Portfolio Setup", href: "/dashboard/portfolio/setup", icon: "Settings" },
+  { name: "Assets", href: "/dashboard/assets", icon: "Server" },
+  { name: "Users", href: "/dashboard/users", icon: "Users" },
+  { name: "Work Orders", href: "/dashboard/work-orders", icon: "ClipboardList" },
+  { name: "PM Dashboard", href: "/dashboard/preventive?view=dashboard", icon: "LayoutDashboard" },
+  { name: "PM Schedules", href: "/dashboard/preventive?view=schedules", icon: "ClipboardList" },
+  { name: "PM Calendar", href: "/dashboard/preventive?view=calendar", icon: "Calendar" },
+  { name: "Inventory Dashboard", href: "/dashboard/inventory", icon: "LayoutDashboard" },
+  { name: "Spare Parts", href: "/dashboard/inventory/spare-parts", icon: "Wrench" },
+  { name: "Categories", href: "/dashboard/inventory/categories", icon: "Layers" },
+  { name: "Warehouses", href: "/dashboard/inventory/warehouses", icon: "Building2" },
+  { name: "Current Stock", href: "/dashboard/inventory/stock", icon: "Archive" },
+  { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
+  { name: "Stock Transactions", href: "/dashboard/inventory/transactions", icon: "History" },
+  { name: "Low Stock Alert", href: "/dashboard/inventory/low-stock", icon: "AlertTriangle" },
+  { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
+];
+
 // Supervisor Navigation
 export const SUPERVISOR_NAV: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-  { name: "Work Order Monitoring", href: "/dashboard/work-orders", icon: "ClipboardList" },
+  { name: "Portfolio Explorer", href: "/dashboard/portfolio", icon: "Building2" },
+  { name: "Portfolio Setup", href: "/dashboard/portfolio/setup", icon: "Settings" },
   { name: "Asset Monitoring", href: "/dashboard/assets", icon: "Server" },
-  { name: "Team Management", href: "/dashboard/team", icon: "Users" },
+  { name: "Work Order Monitoring", href: "/dashboard/work-orders", icon: "ClipboardList" },
+  { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
+  { name: "Team Management", href: "/dashboard/users", icon: "Users" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];
 
@@ -245,10 +291,14 @@ export const TECHNICIAN_NAV: NavItem[] = [
 
 // Inventory Manager Navigation
 export const INVENTORY_MANAGER_NAV: NavItem[] = [
-  { name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-  { name: "Material Management", href: "/dashboard/materials", icon: "Package" },
-  { name: "Spare Parts", href: "/dashboard/spare-parts", icon: "Wrench" },
-  { name: "Inventory Tracking", href: "/dashboard/inventory", icon: "Archive" },
+  { name: "Inventory Dashboard", href: "/dashboard/inventory", icon: "LayoutDashboard" },
+  { name: "Spare Parts", href: "/dashboard/inventory/spare-parts", icon: "Wrench" },
+  { name: "Categories", href: "/dashboard/inventory/categories", icon: "Layers" },
+  { name: "Warehouses", href: "/dashboard/inventory/warehouses", icon: "Building2" },
+  { name: "Current Stock", href: "/dashboard/inventory/stock", icon: "Archive" },
+  { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
+  { name: "Stock Transactions", href: "/dashboard/inventory/transactions", icon: "History" },
+  { name: "Low Stock Alert", href: "/dashboard/inventory/low-stock", icon: "AlertTriangle" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];
@@ -269,8 +319,12 @@ export const getNavByRole = (role: UserRole): NavItem[] => {
   switch (role) {
     case "admin":
       return ADMIN_NAV;
-    case "maintenance_manager":
-      return MAINTENANCE_MANAGER_NAV;
+    case "customer_manager":
+      return CUSTOMER_MANAGER_NAV;
+    case "maintenance_manager" as any:
+      return CUSTOMER_MANAGER_NAV;
+    case "site_incharge":
+      return SITE_INCHARGE_NAV;
     case "supervisor":
       return SUPERVISOR_NAV;
     case "technician":
@@ -293,3 +347,98 @@ export const TRUST_STATS = [
   { value: "50,000+", label: "Assets Managed" },
   { value: "98%", label: "PM Compliance" },
 ] as const;
+
+export type NavCategory = 'DASHBOARD' | 'PORTFOLIO' | 'WORK ORDERS' | 'ASSETS' | 'PM' | 'INVENTORY' | 'REPORTS' | 'SETTINGS';
+
+export const getNavItemCategory = (item: { href: string }): NavCategory => {
+  const href = item.href;
+  if (
+    href === '/dashboard' ||
+    href.startsWith('/dashboard/users') ||
+    href.startsWith('/dashboard/roles') ||
+    href.startsWith('/dashboard/chat')
+  ) {
+    return 'DASHBOARD';
+  }
+  if (
+    href.startsWith('/dashboard/portfolio')
+  ) {
+    return 'PORTFOLIO';
+  }
+  if (href.startsWith('/dashboard/work-orders') || href.startsWith('/dashboard/work-history') || href.startsWith('/dashboard/my-tasks')) {
+    return 'WORK ORDERS';
+  }
+  if (href.startsWith('/dashboard/assets')) {
+    return 'ASSETS';
+  }
+  if (href.startsWith('/dashboard/preventive') || href.startsWith('/dashboard/maintenance-planning')) {
+    return 'PM';
+  }
+  if (
+    href.startsWith('/dashboard/inventory') ||
+    href.startsWith('/dashboard/materials') ||
+    href.startsWith('/dashboard/spare-parts') ||
+    href.startsWith('/dashboard/purchase') ||
+    href.startsWith('/dashboard/purchase-requests') ||
+    href.startsWith('/dashboard/vendors')
+  ) {
+    return 'INVENTORY';
+  }
+  if (href.startsWith('/dashboard/reports') || href.startsWith('/dashboard/audit-logs')) {
+    return 'REPORTS';
+  }
+  if (href.startsWith('/dashboard/settings') || href.startsWith('/dashboard/profile')) {
+    return 'SETTINGS';
+  }
+  return 'DASHBOARD';
+};
+
+export const getCategoryFromPath = (pathname: string): NavCategory => {
+  if (
+    pathname.startsWith('/dashboard/users') ||
+    pathname.startsWith('/dashboard/roles') ||
+    pathname.startsWith('/dashboard/chat')
+  ) {
+    return 'DASHBOARD';
+  }
+  if (
+    pathname.startsWith('/dashboard/portfolio')
+  ) {
+    return 'PORTFOLIO';
+  }
+  if (pathname.startsWith('/dashboard/work-orders') || pathname.startsWith('/dashboard/work-history') || pathname.startsWith('/dashboard/my-tasks')) {
+    return 'WORK ORDERS';
+  }
+  if (pathname.startsWith('/dashboard/assets')) {
+    return 'ASSETS';
+  }
+  if (pathname.startsWith('/dashboard/preventive') || pathname.startsWith('/dashboard/maintenance-planning')) {
+    return 'PM';
+  }
+  if (
+    pathname.startsWith('/dashboard/inventory') ||
+    pathname.startsWith('/dashboard/materials') ||
+    pathname.startsWith('/dashboard/spare-parts') ||
+    pathname.startsWith('/dashboard/purchase') ||
+    pathname.startsWith('/dashboard/purchase-requests') ||
+    pathname.startsWith('/dashboard/vendors')
+  ) {
+    return 'INVENTORY';
+  }
+  if (pathname.startsWith('/dashboard/reports') || pathname.startsWith('/dashboard/audit-logs')) {
+    return 'REPORTS';
+  }
+  if (pathname.startsWith('/dashboard/settings') || pathname.startsWith('/dashboard/profile')) {
+    return 'SETTINGS';
+  }
+  return 'DASHBOARD';
+};
+
+export const getCategoryHref = (category: NavCategory, roleNavItems: { href: string }[]): string => {
+  const itemsInCat = roleNavItems.filter(item => getNavItemCategory(item) === category);
+  if (itemsInCat.length > 0) {
+    return itemsInCat[0].href;
+  }
+  return '/dashboard'; // fallback
+};
+

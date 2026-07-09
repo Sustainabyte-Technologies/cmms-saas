@@ -110,4 +110,22 @@ export class AuthService {
       user: safeUser,
     };
   }
+
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      include: {
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const { passwordHash, ...safeUser } = user;
+    return safeUser;
+  }
 }

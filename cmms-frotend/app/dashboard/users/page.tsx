@@ -63,6 +63,7 @@ export default function UsersPage() {
           email: user.email,
           phoneNumber: user.phoneNumber,
           createdBy: createdByRole,
+          createdById: user.createdById,
           role: roleName.toLowerCase().replace(/ /g, "_"),
           status: "active" as const,
           joinDate: new Date(user.createdAt).toLocaleDateString("en-US", {

@@ -56,6 +56,7 @@ export class AuthController {
     return {
       message: result.message,
       user: result.user,
+      token: result.token,
     };
   }
 
@@ -76,10 +77,14 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getMe(@Req() req: any) {
+  async getMe(@Req() req: any) {
+    const user = await this.authService.getMe(req.user.sub);
     return {
       message: 'Authenticated User',
-      user: req.user,
+      user: {
+        ...user,
+        sub: user.id,
+      },
     };
   }
 }

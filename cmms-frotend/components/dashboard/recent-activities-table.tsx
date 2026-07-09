@@ -12,14 +12,24 @@ import {
 } from "@/components/ui/table";
 import { getRecentActivities, RecentActivitiesResponse } from "@/lib/api/dashboard-api";
 import { Activity } from "lucide-react";
+import { StatusBadge } from "@/components/shared/ui-components";
 
-// Map action types to readable labels and colors
-const ACTION_LABELS: { [key: string]: { label: string; color: string } } = {
-  WORK_ORDER_CREATED: { label: "Created", color: "text-success" },
-  WORK_ORDER_UPDATED: { label: "Updated", color: "text-info" },
-  TECHNICIAN_ASSIGNED: { label: "Assigned", color: "text-primary" },
-  WORK_ORDER_COMPLETED: { label: "Completed", color: "text-success" },
-  WORK_ORDER_CLOSED: { label: "Closed", color: "text-muted-foreground" },
+// Map action types to readable labels and variants for StatusBadge
+const ACTION_MAP: { [key: string]: { label: string; variant: "success" | "warning" | "error" | "info" | "default" } } = {
+  CREATED: { label: "Created", variant: "success" },
+  UPDATED: { label: "Updated", variant: "info" },
+  DELETED: { label: "Deleted", variant: "error" },
+  ASSIGNED: { label: "Assigned", variant: "info" },
+  ACCEPTED: { label: "Accepted", variant: "info" },
+  REJECTED: { label: "Rejected", variant: "warning" },
+  COMPLETED: { label: "Completed", variant: "success" },
+  
+  // Legacy mappings
+  WORK_ORDER_CREATED: { label: "Created", variant: "success" },
+  WORK_ORDER_UPDATED: { label: "Updated", variant: "info" },
+  TECHNICIAN_ASSIGNED: { label: "Assigned", variant: "info" },
+  WORK_ORDER_COMPLETED: { label: "Completed", variant: "success" },
+  WORK_ORDER_CLOSED: { label: "Closed", variant: "default" },
 };
 
 export function RecentActivitiesTable() {
@@ -60,8 +70,8 @@ export function RecentActivitiesTable() {
     }
   };
 
-  const getActionLabel = (action: string) => {
-    return ACTION_LABELS[action] || { label: action, color: "text-muted-foreground" };
+  const getActionInfo = (action: string) => {
+    return ACTION_MAP[action] || { label: action, variant: "default" };
   };
 
   if (loading) {
@@ -101,7 +111,7 @@ export function RecentActivitiesTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Work Order ID</TableHead>
+              <TableHead>Activity</TableHead>
               <TableHead>Action</TableHead>
               <TableHead>Performed By</TableHead>
               <TableHead>Remarks</TableHead>
@@ -110,14 +120,39 @@ export function RecentActivitiesTable() {
           </TableHeader>
           <TableBody>
             {activities.map((activity) => {
-              const actionInfo = getActionLabel(activity.action);
+              const actionInfo = getActionInfo(activity.action);
+              const formatEntityType = (type: string): string => {
+                if (!type) return "Work Order";
+                const mapped: { [key: string]: string } = {
+                  CUSTOMER: "Customer",
+                  SITE: "Site",
+                  DEPARTMENT: "Department",
+                  SYSTEM: "System",
+                  ASSET: "Asset",
+                  WORK_ORDER: "Work Order",
+                  CHECKLIST: "Checklist Template",
+                };
+                return mapped[type.toUpperCase()] || type;
+              };
+
               return (
                 <TableRow key={activity.id}>
-                  <TableCell className="font-mono text-sm">{activity.workOrderId.substring(0, 8)}...</TableCell>
-                  <TableCell>
-                    <span className={`text-sm font-medium ${actionInfo.color}`}>{actionInfo.label}</span>
+                  <TableCell className="font-medium text-sm">
+                    {activity.entityType ? (
+                      <span>
+                        {formatEntityType(activity.entityType)}{" "}
+                        <span className="text-muted-foreground text-xs font-normal">
+                          ({activity.entityName || activity.entityId.substring(0, 8)})
+                        </span>
+                      </span>
+                    ) : (
+                      <span>Work Order</span>
+                    )}
                   </TableCell>
-                  <TableCell className="text-sm">{activity.performedBy.fullName}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={actionInfo.label} variant={actionInfo.variant} />
+                  </TableCell>
+                  <TableCell className="text-sm">{activity.performedBy?.fullName || "System"}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{activity.remarks}</TableCell>
                   <TableCell className="text-right text-sm text-muted-foreground">
                     {formatDate(activity.createdAt)}

@@ -14,7 +14,8 @@ export interface User {
 
 export type UserRole = 
   | "admin"
-  | "maintenance_manager"
+  | "customer_manager"
+  | "site_incharge"
   | "supervisor"
   | "technician"
   | "inventory_manager"

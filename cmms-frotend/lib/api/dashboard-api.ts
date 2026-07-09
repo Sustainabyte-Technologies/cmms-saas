@@ -8,6 +8,14 @@ export interface DashboardOverviewResponse {
     totalAssets: number;
     totalWorkOrders: number;
     openWorkOrders: number;
+    energyConsumptionLastMonth: number;
+    energySavingsLastMonth: number;
+    energySavingsCostLastMonth: number;
+    operationSpendCurrentMonth: number;
+    operationSpendLastMonth: number;
+    targetBudgetCurrentMonth: number;
+    targetBudgetLastMonth: number;
+    expenseTillNow: number;
   };
 }
 
@@ -25,7 +33,9 @@ export interface PerformedByUser {
 
 export interface RecentActivityItem {
   id: string;
-  workOrderId: string;
+  entityType: string;
+  entityId: string;
+  entityName: string;
   action: string;
   remarks: string;
   performedById: string;
@@ -66,7 +76,7 @@ export async function getDashboardOverview(): Promise<DashboardOverviewResponse>
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch dashboard overview`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -75,7 +85,7 @@ export async function getDashboardOverview(): Promise<DashboardOverviewResponse>
       } catch {
         // If error parsing, use default error message
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -104,7 +114,7 @@ export async function getWorkOrderStatus(): Promise<WorkOrderStatusResponse> {
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch work order status`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -113,7 +123,7 @@ export async function getWorkOrderStatus(): Promise<WorkOrderStatusResponse> {
       } catch {
         // If error parsing, use default error message
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -142,7 +152,7 @@ export async function getRecentActivities(): Promise<RecentActivitiesResponse> {
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch recent activities`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -151,7 +161,7 @@ export async function getRecentActivities(): Promise<RecentActivitiesResponse> {
       } catch {
         // If error parsing, use default error message
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -180,7 +190,7 @@ export async function getUserRoleDistribution(): Promise<UserRoleDistributionRes
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch user role distribution`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -189,7 +199,7 @@ export async function getUserRoleDistribution(): Promise<UserRoleDistributionRes
       } catch {
         // If error parsing, use default error message
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -218,7 +228,7 @@ export async function getTechnicianWorkload(): Promise<TechnicianWorkloadRespons
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch technician workload`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -227,7 +237,7 @@ export async function getTechnicianWorkload(): Promise<TechnicianWorkloadRespons
       } catch {
         // If error parsing, use default error message
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -238,3 +248,71 @@ export async function getTechnicianWorkload(): Promise<TechnicianWorkloadRespons
     throw error;
   }
 }
+
+export interface CustomerSummaryItem {
+  customerId: string;
+  customerName: string;
+  customerCode: string;
+  sites: number;
+  departments: number;
+  systems: number;
+  assets: number;
+  workOrders: number;
+  checklists: number;
+}
+
+export interface CustomerSummaryResponse {
+  data: CustomerSummaryItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+/**
+ * Fetch customer hierarchy summary
+ * @returns Array of customer summaries with paginated metadata
+ */
+export async function getDashboardSummary(
+  search?: string,
+  page = 1,
+  limit = 5,
+): Promise<CustomerSummaryResponse> {
+  try {
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    params.append("page", String(page));
+    params.append("limit", String(limit));
+
+    const response = await fetch(`${API_BASE_URL}/dashboard/dashboard-summary?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Send cookies with request
+    });
+
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+      let errorMessage = `HTTP ${response.status}: Failed to fetch dashboard summary`;
+
+      try {
+        if (contentType?.includes("application/json")) {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        }
+      } catch {
+        // If error parsing, use default error message
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const data: CustomerSummaryResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("❌ Failed to fetch dashboard summary:", error);
+    throw error;
+  }
+}
+

@@ -14,8 +14,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { createAsset, uploadAssetImage, Asset, CreateAssetPayload } from "@/lib/api/assets-api";
+import { getCustomers, Customer } from "@/lib/api/customers-api";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, ImageIcon, Package, Info } from "lucide-react";
+import { useEffect } from "react";
 
 interface CreateAssetDialogProps {
   open: boolean;
@@ -33,6 +35,12 @@ export function CreateAssetDialog({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+  const [selectedSiteId, setSelectedSiteId] = useState<string>("");
+  const [selectedDeptId, setSelectedDeptId] = useState<string>("");
+
   const [formData, setFormData] = useState<Omit<CreateAssetPayload, 'status'>>({
     assetName: "",
     category: "",
@@ -43,7 +51,18 @@ export function CreateAssetDialog({
     capacity: "",
     powerRating: "",
     description: "",
+    systemId: "",
   });
+
+  useEffect(() => {
+    if (open) {
+      getCustomers()
+        .then(setCustomers)
+        .catch(err => {
+          console.error("Failed to load customers for asset assignment:", err);
+        });
+    }
+  }, [open]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -90,7 +109,11 @@ export function CreateAssetDialog({
       capacity: "",
       powerRating: "",
       description: "",
+      systemId: "",
     });
+    setSelectedCustomerId("");
+    setSelectedSiteId("");
+    setSelectedDeptId("");
     handleRemoveFile();
   };
 
@@ -112,7 +135,13 @@ export function CreateAssetDialog({
 
     try {
       setLoading(true);
-      let newAsset = await createAsset(formData);
+      let newAsset = await createAsset({
+        ...formData,
+        customerId: selectedCustomerId || undefined,
+        siteId: selectedSiteId || undefined,
+        departmentId: selectedDeptId || undefined,
+        systemId: formData.systemId || undefined,
+      });
 
       if (selectedFile && newAsset.id) {
         try {
@@ -228,6 +257,86 @@ export function CreateAssetDialog({
                     onChange={(e) => handleInputChange(e, "manufacturer")}
                     disabled={loading}
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Section: System Assignment */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">System Assignment (Optional)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customerSelect">Customer</Label>
+                  <select
+                    id="customerSelect"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={selectedCustomerId}
+                    onChange={(e) => {
+                      setSelectedCustomerId(e.target.value);
+                      setSelectedSiteId("");
+                      setSelectedDeptId("");
+                      setFormData(prev => ({ ...prev, systemId: "" }));
+                    }}
+                    disabled={loading}
+                  >
+                    <option value="">— Select Customer —</option>
+                    {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="siteSelect">Site</Label>
+                  <select
+                    id="siteSelect"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={selectedSiteId}
+                    onChange={(e) => {
+                      setSelectedSiteId(e.target.value);
+                      setSelectedDeptId("");
+                      setFormData(prev => ({ ...prev, systemId: "" }));
+                    }}
+                    disabled={loading || !selectedCustomerId}
+                  >
+                    <option value="">— Select Site —</option>
+                    {customers.find(c => c.id === selectedCustomerId)?.sites?.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="deptSelect">Department</Label>
+                  <select
+                    id="deptSelect"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={selectedDeptId}
+                    onChange={(e) => {
+                      setSelectedDeptId(e.target.value);
+                      setFormData(prev => ({ ...prev, systemId: "" }));
+                    }}
+                    disabled={loading || !selectedSiteId}
+                  >
+                    <option value="">— Select Department —</option>
+                    {customers.find(c => c.id === selectedCustomerId)?.sites?.find(s => s.id === selectedSiteId)?.departments?.map(d => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="systemSelect">System</Label>
+                  <select
+                    id="systemSelect"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={formData.systemId || ""}
+                    onChange={(e) => setFormData(prev => ({ ...prev, systemId: e.target.value }))}
+                    disabled={loading || !selectedDeptId}
+                  >
+                    <option value="">— Select System —</option>
+                    {customers.find(c => c.id === selectedCustomerId)?.sites?.find(s => s.id === selectedSiteId)?.departments?.find(d => d.id === selectedDeptId)?.systems?.map(sys => (
+                      <option key={sys.id} value={sys.id}>{sys.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>

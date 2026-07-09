@@ -43,6 +43,19 @@ export default function AssetsPage() {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const { toast } = useToast();
 
+  // Handle deep-linking to specific asset if assetId query param is present
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const assetIdParam = params.get("assetId");
+      if (assetIdParam) {
+        console.log("🔗 Deep link assetId found in URL:", assetIdParam);
+        setSelectedAssetId(assetIdParam);
+        setViewDialogOpen(true);
+      }
+    }
+  }, []);
+
   // Fetch assets on mount and when pagination/search changes
   useEffect(() => {
     const loadAssets = async () => {
