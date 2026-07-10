@@ -75,39 +75,39 @@ export default function TransactionsPage() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Date / Time</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Part Code / Name</TableHead>
-                  <TableHead>Warehouse</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
-                  <TableHead>Performed By</TableHead>
-                  <TableHead>Reference / Notes</TableHead>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-sm font-semibold text-foreground pl-6">Date / Time</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Type</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Part Code / Name</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Warehouse</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground text-right">Quantity</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Performed By</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground pr-6">Reference / Notes</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {txs.map((tx) => (
-                  <TableRow key={tx.id}>
-                    <TableCell className="text-xs text-muted-foreground">
+                  <TableRow key={tx.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="text-xs text-muted-foreground py-4 pl-6">
                       {new Date(tx.createdAt).toLocaleString()}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-4">
                       <span className={getTxTypeBadgeColor(tx.transactionType)}>
                         {tx.transactionType}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-4">
                       <div>
-                        <p className="font-semibold text-xs">{tx.sparePart?.partName}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{tx.sparePart?.partCode}</p>
+                        <p className="font-semibold text-sm text-foreground">{tx.sparePart?.partName}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{tx.sparePart?.partCode}</p>
                       </div>
                     </TableCell>
-                    <TableCell>{tx.warehouse?.name || "Unassigned"}</TableCell>
-                    <TableCell className={`text-right font-bold text-xs ${tx.transactionType === "ISSUE" ? "text-red-600" : "text-green-600"}`}>
+                    <TableCell className="text-sm text-muted-foreground py-4">{tx.warehouse?.name || "Unassigned"}</TableCell>
+                    <TableCell className={`text-right font-bold text-sm py-4 ${tx.transactionType === "ISSUE" ? "text-red-600" : "text-green-600"}`}>
                       {tx.transactionType === "ISSUE" ? "-" : "+"}{tx.quantity} {tx.sparePart?.unit}
                     </TableCell>
-                    <TableCell className="text-xs">{tx.performedBy?.fullName}</TableCell>
-                    <TableCell className="text-xs max-w-[200px] truncate">
+                    <TableCell className="text-sm text-muted-foreground py-4">{tx.performedBy?.fullName}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground py-4 pr-6 max-w-[200px] truncate">
                       {tx.referenceNumber ? `[${tx.referenceNumber}] ` : ""}
                       {tx.notes}
                     </TableCell>

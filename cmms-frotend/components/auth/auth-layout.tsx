@@ -19,7 +19,6 @@ export function AuthLayout({ children, title, subtitle, showBackLink = true }: A
             <Logo href="/" size="xl" imageSize={200} showText={false} showSubtitle={false} textColor="white" />
             <div>
               <h2 className="text-5xl font-bold text-white">{APP_NAME}</h2>
-              <p className="text-sm text-white/80 mt-2">powered by Sustainabyte Technologies</p>
             </div>
           </div>
 

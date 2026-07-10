@@ -185,34 +185,34 @@ export default function PartsRequestsPage() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Request No.</TableHead>
-                  <TableHead>Work Order</TableHead>
-                  <TableHead>Technician</TableHead>
-                  <TableHead>Request Date</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[80px]"></TableHead>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-sm font-semibold text-foreground pl-6">Request No.</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Work Order</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Technician</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Request Date</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Priority</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Status</TableHead>
+                  <TableHead className="w-[80px] text-sm font-semibold text-foreground text-right pr-6">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requests.map((req) => (
-                  <TableRow key={req.id}>
-                    <TableCell className="font-mono font-bold">{req.requestNumber}</TableCell>
-                    <TableCell>
+                  <TableRow key={req.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="font-mono font-bold text-sm py-4 pl-6 text-foreground">{req.requestNumber}</TableCell>
+                    <TableCell className="py-4">
                       <div>
-                        <p className="font-semibold truncate max-w-[200px]">{req.workOrder.title}</p>
+                        <p className="font-medium text-sm text-foreground truncate max-w-[200px]">{req.workOrder.title}</p>
                         <p className="text-xs text-muted-foreground font-mono">{req.workOrder.workOrderNumber}</p>
                       </div>
                     </TableCell>
-                    <TableCell>{req.requestedBy?.fullName}</TableCell>
-                    <TableCell>{new Date(req.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-sm text-muted-foreground py-4">{req.requestedBy?.fullName}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground py-4">{new Date(req.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="py-4 text-xs">
                       <span className={getPriorityColor(req.priority)}>
                         {req.priority}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-4">
                       <StatusBadge
                         status={req.status}
                         variant={
@@ -228,10 +228,12 @@ export default function PartsRequestsPage() {
                         }
                       />
                     </TableCell>
-                    <TableCell>
-                      <Button size="icon" variant="ghost" onClick={() => handleOpenDetails(req)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
+                    <TableCell className="py-4 pr-6">
+                      <div className="flex justify-end">
+                        <Button size="icon" variant="ghost" className="h-8 w-8 p-0 hover:bg-muted" onClick={() => handleOpenDetails(req)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -299,21 +301,21 @@ export default function PartsRequestsPage() {
                   <Table className="border rounded-lg overflow-hidden">
                     <TableHeader className="bg-muted/50">
                       <TableRow>
-                        <TableHead>Part Code / Name</TableHead>
-                        <TableHead className="text-right">Requested Qty</TableHead>
-                        <TableHead className="text-right">Warehouse Stock</TableHead>
+                        <TableHead className="text-xs font-semibold text-foreground pl-4 py-2">Part Code / Name</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-foreground py-2">Requested Qty</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-foreground pr-4 py-2">Warehouse Stock</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {selectedReq.items.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            <p className="font-medium text-xs">{item.sparePart.partName}</p>
+                        <TableRow key={item.id} className="hover:bg-muted/10 transition-colors">
+                          <TableCell className="pl-4 py-3">
+                            <p className="font-semibold text-xs text-foreground">{item.sparePart.partName}</p>
                             <p className="text-[10px] text-muted-foreground font-mono">{item.sparePart.partCode}</p>
                           </TableCell>
-                          <TableCell className="text-right font-bold text-xs">{item.requestedQty} {item.sparePart.unit}</TableCell>
-                          <TableCell className="text-right text-xs">
-                            <span className={item.sparePart.currentStock < item.requestedQty ? "text-destructive font-bold" : "text-green-600"}>
+                          <TableCell className="text-right font-bold text-xs py-3">{item.requestedQty} {item.sparePart.unit}</TableCell>
+                          <TableCell className="text-right text-xs pr-4 py-3">
+                            <span className={item.sparePart.currentStock < item.requestedQty ? "text-destructive font-bold" : "text-green-600 font-semibold"}>
                               {item.sparePart.currentStock} {item.sparePart.unit} ({item.sparePart.warehouse?.name || "No Wh"})
                             </span>
                           </TableCell>

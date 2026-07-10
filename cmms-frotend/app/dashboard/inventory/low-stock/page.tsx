@@ -53,29 +53,29 @@ export default function LowStockPage() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Part Code</TableHead>
-                  <TableHead>Part Name</TableHead>
-                  <TableHead>Warehouse Location</TableHead>
-                  <TableHead className="text-right">Current Stock</TableHead>
-                  <TableHead className="text-right">Safety Minimum</TableHead>
-                  <TableHead className="text-right">Deficit</TableHead>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-sm font-semibold text-foreground pl-6">Part Code</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Part Name</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Warehouse Location</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground text-right">Current Stock</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground text-right">Safety Minimum</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground text-right pr-6">Deficit</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {parts.map((part) => {
                   const deficit = part.minimumStock - part.currentStock;
                   return (
-                    <TableRow key={part.id} className="bg-rose-500/5">
-                      <TableCell className="font-mono text-xs text-rose-600">{part.partCode}</TableCell>
-                      <TableCell className="font-bold flex items-center gap-2">
+                    <TableRow key={part.id} className="bg-rose-500/[0.02] hover:bg-rose-500/[0.04] transition-colors">
+                      <TableCell className="font-mono text-xs py-4 pl-6 text-rose-600 font-semibold">{part.partCode}</TableCell>
+                      <TableCell className="font-semibold text-sm py-4 text-foreground flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-rose-500 shrink-0" />
                         {part.partName}
                       </TableCell>
-                      <TableCell>{part.warehouse?.name || "Unassigned"}</TableCell>
-                      <TableCell className="text-right text-rose-600 font-bold">{part.currentStock} {part.unit}</TableCell>
-                      <TableCell className="text-right text-muted-foreground font-semibold">{part.minimumStock} {part.unit}</TableCell>
-                      <TableCell className="text-right text-rose-600 font-bold">-{deficit} {part.unit}</TableCell>
+                      <TableCell className="text-sm py-4 text-muted-foreground">{part.warehouse?.name || "Unassigned"}</TableCell>
+                      <TableCell className="text-right text-sm text-rose-600 font-bold py-4">{part.currentStock} {part.unit}</TableCell>
+                      <TableCell className="text-right text-sm text-muted-foreground font-semibold py-4">{part.minimumStock} {part.unit}</TableCell>
+                      <TableCell className="text-right text-sm text-rose-600 font-bold py-4 pr-6">-{deficit} {part.unit}</TableCell>
                     </TableRow>
                   );
                 })}

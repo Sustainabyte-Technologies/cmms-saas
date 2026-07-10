@@ -1,7 +1,7 @@
 // CMMS Application Constants
 
 export const APP_NAME = "Fixbyte";
-export const APP_SUBTITLE = "powered by Sustainabyte Technologies";
+export const APP_SUBTITLE = "";
 export const APP_DESCRIPTION = "Reliable Assets. Sustainable Operations.";
 
 // Navigation Links
@@ -12,7 +12,7 @@ export const NAV_LINKS = [
   { name: "Pricing", href: "/pricing" },
   { name: "Roles", href: "/roles" },
   { name: "Contact", href: "/contact" },
-] as const;
+] as const; 
 
 // Features
 export const FEATURES = [

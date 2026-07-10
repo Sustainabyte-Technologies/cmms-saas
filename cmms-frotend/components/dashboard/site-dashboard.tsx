@@ -255,7 +255,7 @@ export function SiteDashboard({
   ];
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-background -m-4 lg:-m-6 overflow-hidden">
+    <div className="flex h-[calc(100vh-80px)] bg-background -m-4 lg:-m-6 overflow-hidden">
       {/* ── Left Navigation Sidebar ── */}
       <div className="w-72 border-r border-border bg-card flex flex-col shrink-0 h-full">
         {/* Back Link */}
