@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && ls -la dist/main.js",
+    "build": "nest build && echo '=== DIST CONTENTS ===' && find dist -name '*.js' | head -30",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
