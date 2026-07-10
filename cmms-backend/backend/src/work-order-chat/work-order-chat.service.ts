@@ -1,14 +1,17 @@
-import { Injectable, ForbiddenException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { WorkOrderChatGateway } from './work-order-chat.gateway';
 
 @Injectable()
 export class WorkOrderChatService {
+  private gateway: any = null;
+
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => WorkOrderChatGateway))
-    private readonly gateway: WorkOrderChatGateway,
   ) {}
+
+  registerGateway(gateway: any) {
+    this.gateway = gateway;
+  }
 
   async checkWorkOrderAccess(
     userId: string,
@@ -186,14 +189,16 @@ export class WorkOrderChatService {
       },
     });
 
-    // Broadcast to room
-    this.gateway.server.to(`workorder:${workOrderId}`).emit('receiveWorkOrderMessage', saved);
+    // Broadcast to room if gateway is registered
+    if (this.gateway?.server) {
+      this.gateway.server.to(`workorder:${workOrderId}`).emit('receiveWorkOrderMessage', saved);
 
-    // Broadcast notifications to all recipients
-    const recipients = await this.getWorkOrderRecipients(workOrderId, organizationId);
-    for (const recipientId of recipients) {
-      if (recipientId !== senderId) {
-        this.gateway.server.to(recipientId).emit('receiveWorkOrderMessageNotification', saved);
+      // Broadcast notifications to all recipients
+      const recipients = await this.getWorkOrderRecipients(workOrderId, organizationId);
+      for (const recipientId of recipients) {
+        if (recipientId !== senderId) {
+          this.gateway.server.to(recipientId).emit('receiveWorkOrderMessageNotification', saved);
+        }
       }
     }
 
