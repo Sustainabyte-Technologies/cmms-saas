@@ -50,6 +50,12 @@ export default function LoginPage() {
       const data = await response.json();
       toast.success("Login successful!");
 
+      // Set cookie client-side on the frontend domain so that Next.js middleware can read it
+      if (data.token) {
+        const secureFlag = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+        document.cookie = `access_token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax${secureFlag}`;
+      }
+
       // Use the role from the response data directly
       if (data.user && data.user.role) {
         const userRole = data.user.role.name; // e.g., "TECHNICIAN"

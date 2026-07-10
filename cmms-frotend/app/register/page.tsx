@@ -62,7 +62,12 @@ export default function RegisterPage() {
       const data = await response.json();
       toast.success("Account created successfully!");
       
-      // Token is automatically stored in cookies via credentials: "include"
+      // Set cookie client-side on the frontend domain so that Next.js middleware can read it
+      if (data.token) {
+        const secureFlag = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+        document.cookie = `access_token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax${secureFlag}`;
+      }
+
       // Store role and organizationId in localStorage so RoleContext can
       // read them (httpOnly cookie is not accessible via document.cookie)
       const userRole = 'ADMIN'; // New registrations are always ADMIN

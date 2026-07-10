@@ -25,10 +25,11 @@ export class AuthController {
   ) {
     const result = await this.authService.register(dto);
 
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('access_token', result.token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -46,10 +47,11 @@ export class AuthController {
   ) {
     const result = await this.authService.login(dto);
 
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('access_token', result.token, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -64,10 +66,11 @@ export class AuthController {
   async logout(
     @Res({ passthrough: true }) res: Response,
   ) {
+    const isProduction = process.env.NODE_ENV === 'production';
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
     });
 
     return {
