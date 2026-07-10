@@ -26,7 +26,7 @@ export class ChecklistController {
   ) { }
 
   @Post('templates')
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER', 'SUPERVISOR')
+  @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
   createTemplate(
     @Body() dto: CreateChecklistTemplateDto,
     @Req() req: any,
@@ -34,6 +34,7 @@ export class ChecklistController {
     return this.checklistService.createTemplate(
       dto,
       req.user.organizationId,
+      req.user.sub,
     );
   }
   @Post('templates/:templateId/items')
@@ -74,6 +75,7 @@ export class ChecklistController {
       id,
       req.user.organizationId,
       dto,
+      req.user.sub,
     );
   }
   @Delete('items/:itemId')
@@ -92,6 +94,7 @@ export class ChecklistController {
     return this.checklistService.deleteTemplate(
       id,
       req.user.organizationId,
+      req.user.sub,
     );
   }
 }

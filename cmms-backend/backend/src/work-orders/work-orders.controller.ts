@@ -27,6 +27,7 @@ import { RejectWorkOrderDto } from './dto/reject-work-order.dto';
 import { UpdateWorkOrderStatusDto } from './dto/update-status.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateWorkOrderAttachmentDto } from './dto/create-work-order-attachment.dto';
+import { SupervisorRejectDto } from './dto/supervisor-reject.dto';
 
 
 @Controller('work-orders')
@@ -42,7 +43,8 @@ export class WorkOrdersController {
     @Post()
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
     )
     async createWorkOrder(
@@ -58,7 +60,8 @@ export class WorkOrdersController {
     @Get()
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
         'TECHNICIAN',
     )
@@ -84,10 +87,130 @@ export class WorkOrdersController {
         );
     }
 
+    @Get('dashboard/stats')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardStats(@Req() req: any) {
+        return this.workOrdersService.getDashboardStats(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/priority')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardPriority(@Req() req: any) {
+        return this.workOrdersService.getDashboardPriority(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/productivity')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardProductivity(@Req() req: any) {
+        return this.workOrdersService.getDashboardProductivity(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/trend')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardTrend(@Req() req: any) {
+        return this.workOrdersService.getDashboardTrend(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/categories')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardCategories(@Req() req: any) {
+        return this.workOrdersService.getDashboardCategories(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/sites')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardSites(@Req() req: any) {
+        return this.workOrdersService.getDashboardSites(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/workload')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardWorkload(@Req() req: any) {
+        return this.workOrdersService.getDashboardWorkload(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/sla')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardSLA(@Req() req: any) {
+        return this.workOrdersService.getDashboardSLA(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/recent')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardRecent(@Req() req: any) {
+        return this.workOrdersService.getDashboardRecent(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/critical')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardCritical(@Req() req: any) {
+        return this.workOrdersService.getDashboardCritical(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/completion-time')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardCompletionTime(@Req() req: any) {
+        return this.workOrdersService.getDashboardCompletionTime(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('my')
+    @UseGuards(JwtAuthGuard)
+    getMyWorkOrders(@Req() req) {
+        return this.workOrdersService.getMyWorkOrders(
+            req.user.sub,
+            req.user.organizationId,
+        );
+    }
+
     @Get(':id')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
         'TECHNICIAN',
     )
@@ -102,11 +225,11 @@ export class WorkOrdersController {
             req.user.role,
         );
     }
-
     @Patch(':id')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
     )
     async updateWorkOrder(
@@ -119,13 +242,15 @@ export class WorkOrdersController {
             dto,
             req.user.organizationId,
             req.user.sub,
+            req.user.role,
         );
     }
 
     @Delete(':id')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
     )
     async deleteWorkOrder(
@@ -135,13 +260,16 @@ export class WorkOrdersController {
         return this.workOrdersService.deleteWorkOrder(
             id,
             req.user.organizationId,
+            req.user.role,
+            req.user.sub,
         );
     }
 
     @Patch(':id/assign-technician')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
     )
     async assignTechnician(
@@ -199,7 +327,8 @@ export class WorkOrdersController {
     @Post(':id/comments')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
         'TECHNICIAN',
     )
@@ -218,7 +347,8 @@ export class WorkOrdersController {
     @Get(':id/comments')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
         'TECHNICIAN',
     )
@@ -275,5 +405,34 @@ export class WorkOrdersController {
         res.setHeader('Content-Type', fileStream.contentType);
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.send(fileStream.buffer);
+    }
+
+    @Patch(':id/approve')
+    @Roles('ADMIN', 'SUPERVISOR', 'SITE_INCHARGE', 'CUSTOMER_MANAGER', 'MAINTENANCE_MANAGER')
+    async approveWorkOrder(
+        @Param('id') id: string,
+        @Req() req: any,
+    ) {
+        return this.workOrdersService.approveWorkOrder(
+            id,
+            req.user.sub,
+            req.user.organizationId,
+        );
+    }
+
+    @Patch(':id/supervisor-reject')
+    @Roles('ADMIN', 'SUPERVISOR', 'SITE_INCHARGE', 'CUSTOMER_MANAGER', 'MAINTENANCE_MANAGER')
+    async rejectWorkOrderSupervisor(
+        @Param('id') id: string,
+        @Body() dto: SupervisorRejectDto,
+        @Req() req: any,
+    ) {
+        return this.workOrdersService.rejectWorkOrderSupervisor(
+            id,
+            dto.reason,
+            dto.reassignTechnicianId,
+            req.user.sub,
+            req.user.organizationId,
+        );
     }
 }

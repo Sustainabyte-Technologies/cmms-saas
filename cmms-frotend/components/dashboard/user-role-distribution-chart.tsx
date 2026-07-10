@@ -22,7 +22,9 @@ interface ChartDataItem {
 // Role colors - professional color scheme
 const ROLE_COLORS: { [key: string]: string } = {
   ADMIN: "hsl(0, 84%, 60%)", // Red
+  CUSTOMER_MANAGER: "hsl(217, 91%, 60%)", // Blue
   MAINTENANCE_MANAGER: "hsl(217, 91%, 60%)", // Blue
+  SITE_INCHARGE: "hsl(180, 70%, 45%)", // Cyan
   SUPERVISOR: "hsl(142, 71%, 45%)", // Green
   TECHNICIAN: "hsl(38, 92%, 50%)", // Amber
   INVENTORY_MANAGER: "hsl(262, 80%, 50%)", // Purple
@@ -32,7 +34,9 @@ const ROLE_COLORS: { [key: string]: string } = {
 // Role labels for display
 const ROLE_LABELS: { [key: string]: string } = {
   ADMIN: "Admin",
+  CUSTOMER_MANAGER: "Customer Manager",
   MAINTENANCE_MANAGER: "Maintenance Manager",
+  SITE_INCHARGE: "Site In-Charge",
   SUPERVISOR: "Supervisor",
   TECHNICIAN: "Technician",
   INVENTORY_MANAGER: "Inventory Manager",

@@ -7,6 +7,9 @@ export interface WorkOrderUser {
   id: string;
   fullName: string;
   email?: string;
+  role?: {
+    name: string;
+  };
 }
 
 export interface WorkOrderAsset {
@@ -60,6 +63,14 @@ export interface WorkOrderResponse {
   activities?: WorkOrderActivityResponse[];
   comments?: WorkOrderCommentResponse[];
   checklistTemplate?: ChecklistTemplate | null;
+  reviewedById?: string | null;
+  reviewedBy?: WorkOrderUser | null;
+  reviewedAt?: string | null;
+  reviewResult?: string | null;
+  reviewNotes?: string | null;
+  breakdownStartedAt?: string | null;
+  assetRestoredAt?: string | null;
+  resolutionNotes?: string | null;
 }
 
 export interface CreateWorkOrderPayload {
@@ -332,3 +343,217 @@ export async function fetchWorkOrderAttachments(
     method: "GET",
   });
 }
+
+/**
+ * Fetch work order dashboard KPI stats
+ */
+export async function fetchWorkOrderDashboardStats(): Promise<{
+  open: number;
+  assigned: number;
+  inProgress: number;
+  completed: number;
+  closed: number;
+  overdue: number;
+  avgTime: string;
+}> {
+  return request<{
+    open: number;
+    assigned: number;
+    inProgress: number;
+    completed: number;
+    closed: number;
+    overdue: number;
+    avgTime: string;
+  }>("/work-orders/dashboard/stats", {
+    method: "GET",
+  });
+}
+
+/**
+ * Fetch work order dashboard priority distribution
+ */
+export async function fetchWorkOrderDashboardPriority(): Promise<
+  Array<{ name: string; value: number; color: string }>
+> {
+  return request<Array<{ name: string; value: number; color: string }>>(
+    "/work-orders/dashboard/priority",
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * Fetch work order dashboard technician productivity
+ */
+export async function fetchWorkOrderDashboardProductivity(): Promise<
+  Array<{ name: string; assigned: number; completed: number }>
+> {
+  return request<Array<{ name: string; assigned: number; completed: number }>>(
+    "/work-orders/dashboard/productivity",
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * Fetch work order dashboard daily trend for the last 30 days
+ */
+export async function fetchWorkOrderDashboardTrend(): Promise<
+  Array<{ date: string; created: number; completed: number; overdue: number }>
+> {
+  return request<Array<{ date: string; created: number; completed: number; overdue: number }>>(
+    "/work-orders/dashboard/trend",
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * Fetch work order dashboard categories counts
+ */
+export async function fetchWorkOrderDashboardCategories(): Promise<
+  Array<{ category: string; count: number }>
+> {
+  return request<Array<{ category: string; count: number }>>("/work-orders/dashboard/categories", {
+    method: "GET",
+  });
+}
+
+/**
+ * Fetch work order dashboard sites analytics
+ */
+export async function fetchWorkOrderDashboardSites(): Promise<
+  Array<{ siteName: string; open: number; completed: number; overdue: number }>
+> {
+  return request<Array<{ siteName: string; open: number; completed: number; overdue: number }>>(
+    "/work-orders/dashboard/sites",
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * Fetch work order dashboard detailed workload
+ */
+export async function fetchWorkOrderDashboardWorkload(): Promise<
+  Array<{ technician: string; assigned: number; completed: number; pending: number; avgTime: string }>
+> {
+  return request<Array<{ technician: string; assigned: number; completed: number; pending: number; avgTime: string }>>(
+    "/work-orders/dashboard/workload",
+    {
+      method: "GET",
+    }
+  );
+}
+
+/**
+ * Fetch work order dashboard SLA compliance
+ */
+export async function fetchWorkOrderDashboardSLA(): Promise<{
+  withinSLA: number;
+  outsideSLA: number;
+}> {
+  return request<{ withinSLA: number; outsideSLA: number }>("/work-orders/dashboard/sla", {
+    method: "GET",
+  });
+}
+
+/**
+ * Fetch work order dashboard recent orders (latest 10)
+ */
+export async function fetchWorkOrderDashboardRecent(): Promise<
+  Array<{
+    workOrderNumber: string;
+    title: string;
+    priority: string;
+    status: string;
+    dueDate: string;
+    assetName: string;
+    technicianName: string;
+  }>
+> {
+  return request<
+    Array<{
+      workOrderNumber: string;
+      title: string;
+      priority: string;
+      status: string;
+      dueDate: string;
+      assetName: string;
+      technicianName: string;
+    }>
+  >("/work-orders/dashboard/recent", {
+    method: "GET",
+  });
+}
+
+/**
+ * Fetch work order dashboard critical alerts list
+ */
+export async function fetchWorkOrderDashboardCritical(): Promise<
+  Array<{
+    id: string;
+    workOrderNumber: string;
+    title: string;
+    priority: string;
+    status: string;
+    dueDate: string;
+    assetName: string;
+    technicianName: string;
+  }>
+> {
+  return request<
+    Array<{
+      id: string;
+      workOrderNumber: string;
+      title: string;
+      priority: string;
+      status: string;
+      dueDate: string;
+      assetName: string;
+      technicianName: string;
+    }>
+  >("/work-orders/dashboard/critical", {
+    method: "GET",
+  });
+}
+
+/**
+ * Fetch work order dashboard average completion time splits
+ */
+export async function fetchWorkOrderDashboardCompletionTime(): Promise<{
+  today: string;
+  thisWeek: string;
+  thisMonth: string;
+}> {
+  return request<{ today: string; thisWeek: string; thisMonth: string }>(
+    "/work-orders/dashboard/completion-time",
+    {
+      method: "GET",
+    }
+  );
+}
+
+export async function approveWorkOrder(id: string): Promise<WorkOrderResponse> {
+  const data = await request<{ workOrder?: WorkOrderResponse } | WorkOrderResponse>(`/work-orders/${id}/approve`, {
+    method: "PATCH",
+  });
+  return unwrapWorkOrder(data);
+}
+
+export async function rejectWorkOrderSupervisor(
+  id: string,
+  payload: { reason: string; reassignTechnicianId: string }
+): Promise<WorkOrderResponse> {
+  const data = await request<{ workOrder?: WorkOrderResponse } | WorkOrderResponse>(`/work-orders/${id}/supervisor-reject`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+  return unwrapWorkOrder(data);
+}
+
+

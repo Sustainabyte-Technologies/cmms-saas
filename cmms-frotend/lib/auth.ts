@@ -73,17 +73,22 @@ export function getUserFromToken(token: DecodedToken) {
 /**
  * Normalize role name to match your role configuration
  */
-export function normalizeRole(role: string): string {
+export function normalizeRole(role: any): string {
+  if (!role) return 'admin';
+  const roleStr = typeof role === 'object' && role.name ? role.name : String(role);
+  
   const roleMap: Record<string, string> = {
     ADMIN: 'admin',
-    MAINTENANCE_MANAGER: 'maintenance_manager',
+    CUSTOMER_MANAGER: 'customer_manager',
+    MAINTENANCE_MANAGER: 'customer_manager',
+    SITE_INCHARGE: 'site_incharge',
     SUPERVISOR: 'supervisor',
     TECHNICIAN: 'technician',
     INVENTORY_MANAGER: 'inventory_manager',
     PURCHASE_MANAGER: 'purchase_manager',
   };
   
-  return roleMap[role.toUpperCase()] || 'admin';
+  return roleMap[roleStr.toUpperCase()] || 'admin';
 }
 
 /**
@@ -93,7 +98,9 @@ export function getRoleDashboardRoute(role: string): string {
   const normalizedRole = normalizeRole(role);
   const roleRoutes: Record<string, string> = {
     admin: '/dashboard',
+    customer_manager: '/dashboard/maintenance-planning',
     maintenance_manager: '/dashboard/maintenance-planning',
+    site_incharge: '/dashboard',
     supervisor: '/dashboard/work-orders',
     technician: '/dashboard/my-tasks',
     inventory_manager: '/dashboard/inventory',
@@ -113,6 +120,8 @@ export function clearTokenFromCookies(): void {
   if (typeof localStorage !== 'undefined') {
     localStorage.removeItem('userRole');
     localStorage.removeItem('organizationId');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
   }
 }
 

@@ -1,37 +1,12 @@
 "use client";
 
-import { PageHeader, StatusBadge } from "@/components/shared/ui-components";
+import { PageHeader } from "@/components/shared/ui-components";
 import { DashboardOverviewCards } from "@/components/dashboard/dashboard-overview-cards";
-import { WorkOrderStatusChart } from "@/components/dashboard/work-order-status-chart";
-import { UserRoleDistributionChart } from "@/components/dashboard/user-role-distribution-chart";
-import { TechnicianWorkloadChart } from "@/components/dashboard/technician-workload-chart";
-import { RecentActivitiesTable } from "@/components/dashboard/recent-activities-table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Server,
-  ClipboardList,
-  Users,
-  Shield,
-  Plus,
-  ArrowUpRight,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Activity,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -39,38 +14,54 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
+  Legend,
+  ComposedChart,
+  Line,
 } from "recharts";
 
-const systemStats = [
-  { month: "Jan", users: 45, logins: 1200 },
-  { month: "Feb", users: 52, logins: 1450 },
-  { month: "Mar", users: 58, logins: 1680 },
-  { month: "Apr", users: 61, logins: 1720 },
-  { month: "May", users: 65, logins: 1890 },
-  { month: "Jun", users: 72, logins: 2100 },
+const energyTrendData = [
+  { month: "Jan", consumption: 48000, savings: 4100 },
+  { month: "Feb", consumption: 46500, savings: 4800 },
+  { month: "Mar", consumption: 45800, savings: 5200 },
+  { month: "Apr", consumption: 44200, savings: 6100 },
+  { month: "May", consumption: 45900, savings: 5500 },
+  { month: "Jun", consumption: 45200, savings: 5400 },
 ];
 
-const roleDistribution = [
-  { name: "Technicians", value: 35, color: "hsl(var(--primary))" },
-  { name: "Supervisors", value: 12, color: "hsl(var(--info))" },
-  { name: "Managers", value: 8, color: "hsl(var(--success))" },
-  { name: "Admin", value: 3, color: "hsl(var(--warning))" },
+const budgetTrendData = [
+  { month: "Jan", spend: 14200, target: 15000 },
+  { month: "Feb", spend: 13800, target: 14500 },
+  { month: "Mar", spend: 12900, target: 14000 },
+  { month: "Apr", spend: 11500, target: 13500 },
+  { month: "May", spend: 12400, target: 14000 },
+  { month: "Jun", spend: 8900, target: 15000 },
 ];
 
-const recentAuditLogs = [
-  { id: 1, user: "Mike Johnson", action: "Created Work Order #1245", module: "Work Orders", time: "2 min ago" },
-  { id: 2, user: "Sarah Chen", action: "Updated Asset #A-0892", module: "Assets", time: "15 min ago" },
-  { id: 3, user: "Tom Williams", action: "Completed Task #T-0456", module: "Tasks", time: "32 min ago" },
-  { id: 4, user: "Emily Davis", action: "Added Inventory Item", module: "Inventory", time: "1 hour ago" },
+const carbonTrendData = [
+  { month: "Jan", emissions: 14.5, target: 16.0 },
+  { month: "Feb", emissions: 13.8, target: 15.5 },
+  { month: "Mar", emissions: 13.2, target: 15.0 },
+  { month: "Apr", emissions: 12.8, target: 14.5 },
+  { month: "May", emissions: 12.6, target: 14.0 },
+  { month: "Jun", emissions: 12.4, target: 13.5 },
 ];
 
-const pendingApprovals = [
-  { id: "PA-001", type: "Purchase Order", requestor: "David Brown", amount: "$4,500", status: "pending" },
-  { id: "PA-002", type: "User Access", requestor: "New Employee", amount: "-", status: "pending" },
-  { id: "PA-003", type: "Asset Disposal", requestor: "Mike Johnson", amount: "$2,100", status: "pending" },
+const waterTrendData = [
+  { month: "Jan", usage: 22000, target: 24000 },
+  { month: "Feb", usage: 21500, target: 23500 },
+  { month: "Mar", usage: 20800, target: 23000 },
+  { month: "Apr", usage: 19500, target: 22500 },
+  { month: "May", usage: 18900, target: 22000 },
+  { month: "Jun", usage: 18500, target: 21500 },
+];
+
+const maintenanceTrendData = [
+  { month: "Jan", cost: 9800, target: 10500 },
+  { month: "Feb", cost: 9400, target: 10000 },
+  { month: "Mar", cost: 8900, target: 9500 },
+  { month: "Apr", cost: 8500, target: 9000 },
+  { month: "May", cost: 8200, target: 9000 },
+  { month: "Jun", cost: 7800, target: 8500 },
 ];
 
 export function AdminDashboard() {
@@ -79,7 +70,7 @@ export function AdminDashboard() {
       {/* Header */}
       <PageHeader
         title="Admin Dashboard"
-        description="Complete system oversight and user management"
+        description="Executive utility monitoring and financial budget overview"
       >
         <Button asChild>
           <Link href="/dashboard/users/new">
@@ -92,159 +83,164 @@ export function AdminDashboard() {
       {/* KPI Cards */}
       <DashboardOverviewCards />
 
-      {/* Charts Row */}
+      {/* Charts Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* System Activity */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-semibold">System Activity</CardTitle>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/audit-logs" className="text-xs">
-                View Logs <ArrowUpRight className="ml-1 h-3 w-3" />
-              </Link>
-            </Button>
+        {/* Energy Consumption & Savings Trend */}
+        <Card className="hover:shadow-md transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Energy Consumption & Savings Trend</CardTitle>
+            <CardDescription>Monthly electrical consumption (kWh) vs savings (kWh)</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[280px]">
+            <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={systemStats}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                  <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                    }}
+                <ComposedChart data={energyTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsla(var(--border) / 0.4)" />
+                  <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis 
+                    yAxisId="left" 
+                    tickFormatter={(val) => `${val.toLocaleString()}`}
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
                   />
-                  <Line type="monotone" dataKey="logins" stroke="hsl(var(--primary))" strokeWidth={2} name="Logins" />
-                </LineChart>
+                  <YAxis 
+                    yAxisId="right" 
+                    orientation="right" 
+                    tickFormatter={(val) => `${val.toLocaleString()}`}
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} 
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Legend />
+                  <Bar yAxisId="left" dataKey="consumption" name="Consumption (kWh)" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                  <Line yAxisId="right" type="monotone" dataKey="savings" name="Savings (kWh)" stroke="#10b981" strokeWidth={2.5} activeDot={{ r: 6 }} />
+                </ComposedChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        {/* User Role Distribution */}
-        <UserRoleDistributionChart />
-      </div>
-
-      {/* Work Order Status */}
-      <WorkOrderStatusChart />
-
-      {/* Technician Workload */}
-      <TechnicianWorkloadChart />
-
-      {/* Tables Row */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Pending Approvals */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-semibold">Pending Approvals</CardTitle>
-            <Button variant="ghost" size="sm" className="text-xs">
-              View All <ArrowUpRight className="ml-1 h-3 w-3" />
-            </Button>
+        {/* Operating Spend vs Target Budget Trend */}
+        <Card className="hover:shadow-md transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Operating Spend vs Target Budget Trend</CardTitle>
+            <CardDescription>Monthly actual spend vs allocated target budget</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Requestor</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pendingApprovals.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.id}</TableCell>
-                    <TableCell>{item.type}</TableCell>
-                    <TableCell>{item.requestor}</TableCell>
-                    <TableCell className="text-right">{item.amount}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={budgetTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsla(var(--border) / 0.4)" />
+                  <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis 
+                    tickFormatter={(val) => `$${val.toLocaleString()}`} 
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <Tooltip 
+                    formatter={(val: any) => [`$${val.toLocaleString()}`, undefined]}
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="spend" name="Actual Spend" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                  <Bar dataKey="target" name="Target Budget" fill="hsl(var(--muted-foreground) / 0.25)" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Recent Audit Logs */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-semibold">Recent Audit Logs</CardTitle>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/audit-logs" className="text-xs">
-                View All <ArrowUpRight className="ml-1 h-3 w-3" />
-              </Link>
-            </Button>
+        {/* Carbon Footprint vs Offset Goal */}
+        <Card className="hover:shadow-md transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Carbon Footprint vs Offset Goal</CardTitle>
+            <CardDescription>Monthly actual emissions (tCO₂e) vs reduction targets</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead className="text-right">Time</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentAuditLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-medium">{log.user}</TableCell>
-                    <TableCell>
-                      <p className="text-sm">{log.action}</p>
-                      <p className="text-xs text-muted-foreground">{log.module}</p>
-                    </TableCell>
-                    <TableCell className="text-right text-sm text-muted-foreground">{log.time}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={carbonTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsla(var(--border) / 0.4)" />
+                  <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis 
+                    tickFormatter={(val) => `${val} t`}
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <Tooltip 
+                    formatter={(val: any) => [`${val} tCO₂e`, undefined]}
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="emissions" name="Actual Emissions" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                  <Bar dataKey="target" name="Reduction Target" fill="hsl(var(--muted-foreground) / 0.25)" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Water Usage & Conservation Goal */}
+        <Card className="hover:shadow-md transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Water Usage & Conservation Goal</CardTitle>
+            <CardDescription>Monthly actual water usage (Gallons) vs threshold targets</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={waterTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsla(var(--border) / 0.4)" />
+                  <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis 
+                    tickFormatter={(val) => `${val.toLocaleString()}`}
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <Tooltip 
+                    formatter={(val: any) => [`${val.toLocaleString()} Gal`, undefined]}
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="usage" name="Actual Usage" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                  <Bar dataKey="target" name="Conservation Target" fill="hsl(var(--muted-foreground) / 0.25)" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Routine Maintenance Costs vs Target */}
+        <Card className="lg:col-span-2 hover:shadow-md transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Routine Maintenance Costs vs Target</CardTitle>
+            <CardDescription>Monthly actual maintenance costs vs allocated budget limits</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[320px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={maintenanceTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsla(var(--border) / 0.4)" />
+                  <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis 
+                    tickFormatter={(val) => `$${val.toLocaleString()}`}
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <Tooltip 
+                    formatter={(val: any) => [`$${val.toLocaleString()}`, undefined]}
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="cost" name="Actual Cost" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={45} />
+                  <Line type="monotone" dataKey="target" name="Target Budget Limit" stroke="#6366f1" strokeWidth={2.5} activeDot={{ r: 6 }} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* System Alerts */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <Activity className="h-5 w-5" />
-            System Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 rounded-lg bg-warning/10 p-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 text-warning" />
-              <div>
-                <p className="font-medium">License Renewal Required</p>
-                <p className="text-sm text-muted-foreground">Your enterprise license expires in 30 days</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 rounded-lg bg-success/10 p-3">
-              <CheckCircle className="mt-0.5 h-5 w-5 text-success" />
-              <div>
-                <p className="font-medium">System Backup Completed</p>
-                <p className="text-sm text-muted-foreground">Last backup: Today at 3:00 AM</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 rounded-lg bg-info/10 p-3">
-              <Clock className="mt-0.5 h-5 w-5 text-info" />
-              <div>
-                <p className="font-medium">Scheduled Maintenance</p>
-                <p className="text-sm text-muted-foreground">System maintenance scheduled for Sunday 2:00 AM</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* User Role Distribution */}
-      <UserRoleDistributionChart />
-
-      {/* Recent Activities */}
-      <RecentActivitiesTable />
     </div>
   );
 }

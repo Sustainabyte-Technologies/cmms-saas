@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { PageHeader, StatusBadge } from "@/components/shared/ui-components";
 import { DashboardOverviewCards } from "@/components/dashboard/dashboard-overview-cards";
 import { WorkOrderStatusChart } from "@/components/dashboard/work-order-status-chart";
@@ -21,8 +22,10 @@ import {
   ArrowRight,
   AlertCircle,
   Wrench,
+  QrCode,
 } from "lucide-react";
 import Link from "next/link";
+import { AssetScannerDialog } from "@/components/dashboard/scanner/asset-scanner-dialog";
 
 const myTasks = [
   { 
@@ -76,6 +79,7 @@ const getPriorityVariant = (priority: string) => {
 };
 
 export function TechnicianDashboard() {
+  const [scannerOpen, setScannerOpen] = useState(false);
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -214,7 +218,11 @@ export function TechnicianDashboard() {
           <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <Button variant="outline" className="h-auto flex-col gap-2 py-4 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300" onClick={() => setScannerOpen(true)}>
+              <QrCode className="h-5 w-5 text-primary animate-pulse" />
+              <span className="font-semibold text-xs">Scan Asset QR</span>
+            </Button>
             <Button variant="outline" className="h-auto flex-col gap-2 py-4">
               <AlertCircle className="h-5 w-5 text-warning" />
               <span>Report Issue</span>
@@ -243,6 +251,9 @@ export function TechnicianDashboard() {
 
       {/* Recent Activities */}
       <RecentActivitiesTable />
+
+      {/* Asset Scanner Dialog */}
+      <AssetScannerDialog open={scannerOpen} onOpenChange={setScannerOpen} />
     </div>
   );
 }

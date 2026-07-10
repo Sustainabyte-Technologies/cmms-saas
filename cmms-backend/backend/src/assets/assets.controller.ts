@@ -33,7 +33,7 @@ export class AssetsController {
     ) { }
 
     @Post()
-    @Roles('ADMIN', 'MAINTENANCE_MANAGER', 'SUPERVISOR')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
     async createAsset(
         @Body() dto: CreateAssetDto,
         @Req() req: any,
@@ -48,8 +48,10 @@ export class AssetsController {
     @Get()
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
+        'TECHNICIAN',
     )
     async getAssets(
         @Req() req: any,
@@ -64,14 +66,118 @@ export class AssetsController {
                 limit: Number(limit) || 10,
                 search,
             },
+            req.user.sub,
+            req.user.role,
+        );
+    }
+
+    @Get('dashboard/stats')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardStats(@Req() req: any) {
+        return this.assetsService.getDashboardStats(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/categories')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardCategories(@Req() req: any) {
+        return this.assetsService.getDashboardCategories(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/locations')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardLocations(@Req() req: any) {
+        return this.assetsService.getDashboardLocations(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/warranty')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardWarranty(@Req() req: any) {
+        return this.assetsService.getDashboardWarranty(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/health')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardHealth(@Req() req: any) {
+        return this.assetsService.getDashboardHealth(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/downtime')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardDowntime(@Req() req: any) {
+        return this.assetsService.getDashboardDowntime(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/health-distribution')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardHealthDistribution(@Req() req: any) {
+        return this.assetsService.getDashboardHealthDistribution(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/lifecycle')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardLifecycle(@Req() req: any) {
+        return this.assetsService.getDashboardLifecycle(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/location-hierarchy')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardLocationHierarchy(@Req() req: any) {
+        return this.assetsService.getDashboardLocationHierarchy(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
+        );
+    }
+
+    @Get('dashboard/critical-list')
+    @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
+    async getDashboardCriticalList(@Req() req: any) {
+        return this.assetsService.getDashboardCriticalList(
+            req.user.organizationId,
+            req.user.role,
+            req.user.sub,
         );
     }
 
     @Get(':id')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
         'SUPERVISOR',
+        'TECHNICIAN',
     )
     async getAssetById(
         @Param('id') id: string,
@@ -80,13 +186,17 @@ export class AssetsController {
         return this.assetsService.getAssetById(
             id,
             req.user.organizationId,
+            req.user.sub,
+            req.user.role,
         );
     }
 
     @Patch(':id')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
+        'SUPERVISOR',
     )
     async updateAsset(
         @Param('id') id: string,
@@ -97,13 +207,17 @@ export class AssetsController {
             id,
             dto,
             req.user.organizationId,
+            req.user.role,
+            req.user.sub,
         );
     }
 
     @Delete(':id')
     @Roles(
         'ADMIN',
-        'MAINTENANCE_MANAGER',
+        'CUSTOMER_MANAGER',
+        'SITE_INCHARGE',
+        'SUPERVISOR',
     )
     async deleteAsset(
         @Param('id') id: string,
@@ -112,8 +226,11 @@ export class AssetsController {
         return this.assetsService.deleteAsset(
             id,
             req.user.organizationId,
+            req.user.role,
+            req.user.sub,
         );
     }
+
     @Post(':id/image')
     @UseInterceptors(FileInterceptor('file'))
     async uploadAssetImage(

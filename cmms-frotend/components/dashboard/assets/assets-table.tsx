@@ -62,6 +62,46 @@ const formatDate = (dateString: string) => {
   });
 };
 
+function canModifyItem(
+  userRole: string | undefined | null,
+  createdBy?: { role?: { name: string } } | null
+): boolean {
+  if (!userRole) return false;
+  const normalizedUserRole = userRole.toLowerCase();
+
+  // Only admin, maintenance_manager, and supervisor can edit/delete assets
+  if (
+    normalizedUserRole !== "admin" &&
+    normalizedUserRole !== "maintenance_manager" &&
+    normalizedUserRole !== "supervisor"
+  ) {
+    return false;
+  }
+
+  // If the logged-in user is ADMIN, they can always edit/delete
+  if (normalizedUserRole === "admin") return true;
+
+  // If the item has no creator (legacy data), allow modification
+  if (!createdBy) return true;
+
+  const creatorRole = createdBy.role?.name?.toLowerCase();
+
+  // 1. If created by admin, maintenance_manager cannot edit/delete
+  if (creatorRole === "admin" && normalizedUserRole === "maintenance_manager") {
+    return false;
+  }
+
+  // 2. If created by admin or maintenance_manager, supervisor cannot edit/delete
+  if (
+    (creatorRole === "admin" || creatorRole === "maintenance_manager") &&
+    normalizedUserRole === "supervisor"
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 export function AssetsTable({ data, caption, onView, onEdit, onDelete }: AssetsTableProps) {
   const { role } = useRole();
 
@@ -74,6 +114,10 @@ export function AssetsTable({ data, caption, onView, onEdit, onDelete }: AssetsT
             Asset Name
           </TableHead>
           <TableHead className="text-sm font-semibold text-foreground">Code</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Customer</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Site</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">Department</TableHead>
+          <TableHead className="text-sm font-semibold text-foreground">System</TableHead>
           <TableHead className="text-sm font-semibold text-foreground">Category</TableHead>
           <TableHead className="text-sm font-semibold text-foreground">Location</TableHead>
           <TableHead className="text-sm font-semibold text-foreground">Status</TableHead>
@@ -86,7 +130,7 @@ export function AssetsTable({ data, caption, onView, onEdit, onDelete }: AssetsT
       </TableHeader>
       <TableBody>
         {data.map((asset) => {
-          const canEdit = role === "admin" || role === "maintenance_manager";
+          const canEdit = canModifyItem(role, asset.createdBy);
 
           return (
             <TableRow key={asset.id} className="hover:bg-muted/30 transition-colors">
@@ -95,6 +139,18 @@ export function AssetsTable({ data, caption, onView, onEdit, onDelete }: AssetsT
               </TableCell>
               <TableCell className="text-muted-foreground text-sm py-4">
                 {asset.assetCode}
+              </TableCell>
+              <TableCell className="text-muted-foreground text-sm py-4">
+                {asset.customer?.name || "—"}
+              </TableCell>
+              <TableCell className="text-muted-foreground text-sm py-4">
+                {asset.site?.name || "—"}
+              </TableCell>
+              <TableCell className="text-muted-foreground text-sm py-4">
+                {asset.department?.name || "—"}
+              </TableCell>
+              <TableCell className="text-muted-foreground text-sm py-4">
+                {asset.system?.name || "—"}
               </TableCell>
               <TableCell className="py-4">
                 <Badge

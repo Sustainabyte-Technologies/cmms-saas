@@ -60,6 +60,8 @@ export default function LoginPage() {
         if (typeof window !== 'undefined') {
           localStorage.setItem('userRole', userRole);
           localStorage.setItem('organizationId', data.user.organizationId);
+          localStorage.setItem('userId', data.user.id);
+          localStorage.setItem('userEmail', data.user.email);
         }
         
         router.push(roleRoute);

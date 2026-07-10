@@ -19,6 +19,14 @@ export interface Asset {
   salvageValue?: number;
   depreciationRate?: number;
   status?: "ACTIVE" | "UNDER_MAINTENANCE" | "BREAKDOWN" | "IDLE" | "RETIRED";
+  systemId?: string;
+  customerId?: string;
+  siteId?: string;
+  departmentId?: string;
+  customer?: { id: string; name: string; code: string } | null;
+  site?: { id: string; name: string; code: string } | null;
+  department?: { id: string; name: string; code: string } | null;
+  system?: { id: string; name: string; code: string } | null;
   createdAt: string;
   createdBy?: {
     id: string;
@@ -41,6 +49,10 @@ export interface CreateAssetPayload {
   powerRating?: string;
   description?: string;
   status?: string;
+  systemId?: string | null;
+  customerId?: string | null;
+  siteId?: string | null;
+  departmentId?: string | null;
 }
 
 export interface PaginationInfo {
@@ -105,7 +117,7 @@ export async function fetchAssets(page: number = 1, limit: number = 10, search: 
 
     const data = await response.json();
     console.log("✅ Assets fetched successfully:", data);
-    
+
     // Handle both direct array response and paginated response
     if (Array.isArray(data)) {
       return {
@@ -376,4 +388,141 @@ export async function uploadAssetImage(
     console.error("❌ Error uploading image:", errorMessage);
     throw error;
   }
+}
+
+/**
+ * Helper to perform GET requests with credentials
+ */
+async function getJson(url: string): Promise<any> {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    let errorMessage = `HTTP ${response.status}: Failed to fetch`;
+    try {
+      const contentType = response.headers.get("content-type");
+      if (contentType?.includes("application/json")) {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      }
+    } catch (_) { }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+/**
+ * Fetch asset dashboard KPI statistics
+ */
+export async function fetchAssetDashboardStats(): Promise<{
+  totalAssets: number;
+  activeAssets: number;
+  underMaintenance: number;
+  criticalAssets: number;
+  idleAssets: number;
+  retiredAssets: number;
+  warrantyExpiring: number;
+  avgHealthScore: number;
+  availability: number;
+}> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/stats`);
+}
+
+/**
+ * Fetch asset dashboard category distribution
+ */
+export async function fetchAssetDashboardCategories(): Promise<
+  Array<{ category: string; count: number }>
+> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/categories`);
+}
+
+/**
+ * Fetch asset dashboard locations registry
+ */
+export async function fetchAssetDashboardLocations(): Promise<
+  Array<{ location: string; count: number; description: string }>
+> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/locations`);
+}
+
+/**
+ * Fetch asset dashboard critical/warranty assets
+ */
+export async function fetchAssetDashboardWarranty(): Promise<
+  Array<{ id: string; assetName: string; assetCode: string; warranty: string }>
+> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/warranty`);
+}
+
+/**
+ * Fetch asset dashboard health scores
+ */
+export async function fetchAssetDashboardHealth(): Promise<
+  Array<{ id: string; assetName: string; assetCode: string; health: string }>
+> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/health`);
+}
+
+/**
+ * Fetch asset dashboard downtime analysis
+ */
+export async function fetchAssetDashboardDowntime(): Promise<
+  Array<{ name: string; hours: number }>
+> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/downtime`);
+}
+
+/**
+ * Fetch asset health distribution (Donut chart: Healthy/Warning/Critical/Offline)
+ */
+export async function fetchAssetDashboardHealthDistribution(): Promise<
+  Array<{ name: string; value: number; color: string }>
+> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/health-distribution`);
+}
+
+/**
+ * Fetch asset lifecycle status (pipeline/funnel: Registered/Installed/Running/Maintenance/Retired)
+ */
+export async function fetchAssetDashboardLifecycle(): Promise<
+  Array<{ stage: string; count: number; color: string }>
+> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/lifecycle`);
+}
+
+/**
+ * Fetch asset location hierarchy (Customer → Site → Department)
+ */
+export interface LocationHierarchyDepartment { id: string; name: string; count: number; }
+export interface LocationHierarchySite { id: string; name: string; count: number; departments: LocationHierarchyDepartment[]; }
+export interface LocationHierarchyCustomer { id: string; name: string; count: number; sites: LocationHierarchySite[]; }
+
+export async function fetchAssetDashboardLocationHierarchy(): Promise<LocationHierarchyCustomer[]> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/location-hierarchy`);
+}
+
+/**
+ * Fetch critical asset list with health %, warranty, last service, next PM, status
+ */
+export interface CriticalAssetItem {
+  id: string;
+  assetCode: string;
+  assetName: string;
+  category: string;
+  status: string;
+  health: number;
+  warranty: string;
+  lastService: string | null;
+  nextPm: string | null;
+}
+
+export async function fetchAssetDashboardCriticalList(): Promise<CriticalAssetItem[]> {
+  return getJson(`${API_BASE_URL}/assets/dashboard/critical-list`);
 }

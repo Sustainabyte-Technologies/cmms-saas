@@ -16,7 +16,7 @@ export function AuthLayout({ children, title, subtitle, showBackLink = true }: A
       <div className="hidden w-1/2 bg-gradient-to-br from-[#81C816] to-[#81C816] lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-12">
         <div className="flex flex-col items-center justify-center space-y-10 text-center">
           <div className="flex flex-col items-center gap-4">
-            <Logo href="/" size="xl" showSubtitle={false} textColor="white" />
+            <Logo href="/" size="xl" imageSize={200} showText={false} showSubtitle={false} textColor="white" />
             <div>
               <h2 className="text-5xl font-bold text-white">{APP_NAME}</h2>
               <p className="text-sm text-white/80 mt-2">powered by Sustainabyte Technologies</p>

@@ -10,21 +10,23 @@ interface LogoProps {
   showSubtitle?: boolean;
   textColor?: "foreground" | "white";
   imageSize?: number;
+  showText?: boolean;
 }
 
 const sizeConfig = {
   sm: { image: 24, text: "text-sm" },
   md: { image: 36, text: "text-base" },
-  lg: { image: 48, text: "text-lg" },
-  xl: { image: 64, text: "text-2xl" },
+  lg: { image: 54, text: "text-xl" },
+  xl: { image: 72, text: "text-3xl" },
 };
 
-export function Logo({ 
-  href = "/", 
-  size = "md", 
+export function Logo({
+  href = "/",
+  size = "md",
   showSubtitle = true,
   textColor = "foreground",
-  imageSize
+  imageSize,
+  showText = true,
 }: LogoProps) {
   const sizeConfig_ = sizeConfig[size];
   const imageDimension = imageSize || sizeConfig_.image;
@@ -34,24 +36,26 @@ export function Logo({
   return (
     <Link href={href} className="flex items-center gap-3 w-fit">
       <div className="flex items-center justify-center shrink-0">
-        <Image 
-          src="/logo.png" 
-          alt="Fixbyte Logo" 
-          width={imageDimension} 
+        <Image
+          src="/fixbyte.png"
+          alt="Fixbyte Logo"
+          width={imageDimension}
           height={imageDimension}
           priority
         />
       </div>
-      <div className="flex flex-col">
-        <span className={`${sizeConfig_.text} font-bold ${textColorClass}`}>
-          {APP_NAME}
-        </span>
-        {showSubtitle && (
-          <span className="text-xs" style={{ color: textColor === "white" ? "rgba(255, 255, 255, 0.8)" : "var(--muted-foreground)" }}>
-            {APP_SUBTITLE}
+      {showText && (
+        <div className="flex flex-col">
+          <span className={`${sizeConfig_.text} font-bold ${textColorClass}`}>
+            {APP_NAME}
           </span>
-        )}
-      </div>
+          {showSubtitle && (
+            <span className="text-xs" style={{ color: textColor === "white" ? "rgba(255, 255, 255, 0.8)" : "var(--muted-foreground)" }}>
+              {APP_SUBTITLE}
+            </span>
+          )}
+        </div>
+      )}
     </Link>
   );
 }

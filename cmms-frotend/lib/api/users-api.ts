@@ -7,7 +7,7 @@ export interface CreateUserPayload {
   email: string;
   password: string;
   phoneNumber: string;
-  roleName: "ADMIN" | "MAINTENANCE_MANAGER" | "SUPERVISOR" | "TECHNICIAN" | "INVENTORY_MANAGER" | "PURCHASE_MANAGER";
+  roleName: "ADMIN" | "MAINTENANCE_MANAGER" | "CUSTOMER_MANAGER" | "SITE_INCHARGE" | "SUPERVISOR" | "TECHNICIAN" | "INVENTORY_MANAGER" | "PURCHASE_MANAGER";
 }
 
 export interface UserResponse {
@@ -43,7 +43,7 @@ export interface UpdateProfilePayload {
 export async function createUser(userData: CreateUserPayload): Promise<UserResponse> {
   try {
     console.log("🔄 Creating user:", userData);
-    
+
     const response = await fetch(`${API_BASE_URL}/users`, {
       method: "POST",
       headers: {
@@ -58,7 +58,7 @@ export async function createUser(userData: CreateUserPayload): Promise<UserRespo
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to create user`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -70,7 +70,7 @@ export async function createUser(userData: CreateUserPayload): Promise<UserRespo
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -80,13 +80,13 @@ export async function createUser(userData: CreateUserPayload): Promise<UserRespo
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("❌ Error creating user:", errorMessage);
-    
+
     if (errorMessage.includes("Failed to fetch")) {
       throw new Error(
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
     throw error;
   }
 }
@@ -98,7 +98,7 @@ export async function createUser(userData: CreateUserPayload): Promise<UserRespo
 export async function fetchUsers(): Promise<any> {
   try {
     console.log("🔄 Fetching users from:", `${API_BASE_URL}/users`);
-    
+
     const response = await fetch(`${API_BASE_URL}/users`, {
       method: "GET",
       headers: {
@@ -112,7 +112,7 @@ export async function fetchUsers(): Promise<any> {
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch users`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -124,7 +124,7 @@ export async function fetchUsers(): Promise<any> {
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -134,12 +134,12 @@ export async function fetchUsers(): Promise<any> {
       firstUser: Array.isArray(data) && data[0] ? data[0] : null,
     });
     console.log("📊 Full Users Data:", data);
-    
+
     return data;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("❌ Error fetching users:", errorMessage);
-    
+
     // Check if it's a network error
     if (errorMessage.includes("Failed to fetch")) {
       console.error("⚠️ Network error - Backend might not be running at", `${API_BASE_URL}`);
@@ -147,7 +147,7 @@ export async function fetchUsers(): Promise<any> {
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
     throw error;
   }
 }
@@ -163,13 +163,13 @@ export async function updateUser(
   updateData: {
     fullName?: string;
     phoneNumber?: string;
-    roleName?: "ADMIN" | "MAINTENANCE_MANAGER" | "SUPERVISOR" | "TECHNICIAN" | "INVENTORY_MANAGER" | "PURCHASE_MANAGER";
+    roleName?: "ADMIN" | "MAINTENANCE_MANAGER" | "CUSTOMER_MANAGER" | "SITE_INCHARGE" | "SUPERVISOR" | "TECHNICIAN" | "INVENTORY_MANAGER" | "PURCHASE_MANAGER";
     password?: string;
   }
 ): Promise<UserResponse> {
   try {
     console.log("🔄 Updating user:", userId, updateData);
-    
+
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: "PATCH",
       headers: {
@@ -184,7 +184,7 @@ export async function updateUser(
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to update user`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -196,7 +196,7 @@ export async function updateUser(
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -206,13 +206,13 @@ export async function updateUser(
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("❌ Error updating user:", errorMessage);
-    
+
     if (errorMessage.includes("Failed to fetch")) {
       throw new Error(
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
     throw error;
   }
 }
@@ -225,7 +225,7 @@ export async function updateUser(
 export async function deleteUser(userId: string): Promise<void> {
   try {
     console.log("🔄 Deleting user:", userId);
-    
+
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: "DELETE",
       headers: {
@@ -239,7 +239,7 @@ export async function deleteUser(userId: string): Promise<void> {
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to delete user`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -251,7 +251,7 @@ export async function deleteUser(userId: string): Promise<void> {
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -259,13 +259,13 @@ export async function deleteUser(userId: string): Promise<void> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("❌ Error deleting user:", errorMessage);
-    
+
     if (errorMessage.includes("Failed to fetch")) {
       throw new Error(
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
     throw error;
   }
 }
@@ -277,7 +277,7 @@ export async function deleteUser(userId: string): Promise<void> {
 export async function fetchTechnicianWorkload(): Promise<any[]> {
   try {
     console.log("🔄 Fetching technician workload from:", `${API_BASE_URL}/users/technicians/workload`);
-    
+
     const response = await fetch(`${API_BASE_URL}/users/technicians/workload`, {
       method: "GET",
       headers: {
@@ -291,7 +291,7 @@ export async function fetchTechnicianWorkload(): Promise<any[]> {
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch technician workload`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -303,7 +303,7 @@ export async function fetchTechnicianWorkload(): Promise<any[]> {
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -313,13 +313,13 @@ export async function fetchTechnicianWorkload(): Promise<any[]> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("❌ Error fetching technician workload:", errorMessage);
-    
+
     if (errorMessage.includes("Failed to fetch")) {
       throw new Error(
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
     throw error;
   }
 }
@@ -331,7 +331,7 @@ export async function fetchTechnicianWorkload(): Promise<any[]> {
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
   try {
     console.log("🔄 Fetching authenticated user from:", `${API_BASE_URL}/auth/me`);
-    
+
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
       method: "GET",
       headers: {
@@ -345,7 +345,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch authenticated user`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -357,7 +357,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -366,14 +366,14 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
     return data.user || data;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("❌ Error fetching authenticated user:", errorMessage);
-    
     if (errorMessage.includes("Failed to fetch")) {
+      console.warn("⚠️ Network warning: Cannot connect to server. Make sure the backend is running.");
       throw new Error(
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
+    console.error("❌ Error fetching authenticated user:", errorMessage);
     throw error;
   }
 }
@@ -386,7 +386,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser> {
 export async function getUserById(userId: string): Promise<UserResponse> {
   try {
     console.log("🔄 Fetching user:", `${API_BASE_URL}/users/${userId}`);
-    
+
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: "GET",
       headers: {
@@ -400,7 +400,7 @@ export async function getUserById(userId: string): Promise<UserResponse> {
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to fetch user`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -412,7 +412,7 @@ export async function getUserById(userId: string): Promise<UserResponse> {
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -422,13 +422,13 @@ export async function getUserById(userId: string): Promise<UserResponse> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("❌ Error fetching user:", errorMessage);
-    
+
     if (errorMessage.includes("Failed to fetch")) {
       throw new Error(
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
     throw error;
   }
 }
@@ -445,7 +445,7 @@ export async function updateUserProfile(
 ): Promise<UserResponse> {
   try {
     console.log("🔄 Updating profile for user:", userId, updateData);
-    
+
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       method: "PATCH",
       headers: {
@@ -460,7 +460,7 @@ export async function updateUserProfile(
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
       let errorMessage = `HTTP ${response.status}: Failed to update profile`;
-      
+
       try {
         if (contentType?.includes("application/json")) {
           const errorData = await response.json();
@@ -472,7 +472,7 @@ export async function updateUserProfile(
       } catch (parseError) {
         console.error("Could not parse error response:", parseError);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -482,13 +482,13 @@ export async function updateUserProfile(
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("❌ Error updating profile:", errorMessage);
-    
+
     if (errorMessage.includes("Failed to fetch")) {
       throw new Error(
         `Cannot connect to server at ${API_BASE_URL}. Make sure the backend is running.`
       );
     }
-    
+
     throw error;
   }
 }

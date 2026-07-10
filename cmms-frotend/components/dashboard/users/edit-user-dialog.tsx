@@ -32,13 +32,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import { useRole } from "@/contexts/role-context";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
   phoneNumber: z.string().min(10, "Phone number must be valid"),
   roleName: z.enum([
     "ADMIN",
+    "CUSTOMER_MANAGER",
     "MAINTENANCE_MANAGER",
+    "SITE_INCHARGE",
     "SUPERVISOR",
     "TECHNICIAN",
     "INVENTORY_MANAGER",
@@ -83,6 +86,7 @@ export function EditUserDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const { role } = useRole();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -260,18 +264,29 @@ export function EditUserDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="MAINTENANCE_MANAGER">
-                        Maintenance Manager
-                      </SelectItem>
-                      <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
+                      {role === "admin" && (
+                        <SelectItem value="ADMIN">Admin</SelectItem>
+                      )}
+                      {(role === "admin" || role === "customer_manager") && (
+                        <>
+                          <SelectItem value="CUSTOMER_MANAGER">
+                            Customer Manager
+                          </SelectItem>
+                          <SelectItem value="SITE_INCHARGE">
+                            Site In-Charge
+                          </SelectItem>
+                          <SelectItem value="INVENTORY_MANAGER">
+                            Inventory Manager
+                          </SelectItem>
+                          <SelectItem value="PURCHASE_MANAGER">
+                            Purchase Manager
+                          </SelectItem>
+                        </>
+                      )}
+                      {(role === "admin" || role === "customer_manager" || role === "site_incharge") && (
+                        <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
+                      )}
                       <SelectItem value="TECHNICIAN">Technician</SelectItem>
-                      <SelectItem value="INVENTORY_MANAGER">
-                        Inventory Manager
-                      </SelectItem>
-                      <SelectItem value="PURCHASE_MANAGER">
-                        Purchase Manager
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -27,7 +27,7 @@ export class UsersController {
   ) { }
 
   @Post()
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER')
+  @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
   async createUser(
     @Body() dto: CreateUserDto,
     @Req() req: any,
@@ -40,7 +40,7 @@ export class UsersController {
     );
   }
   @Get()
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER', 'SUPERVISOR')
+  @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
   async getUsers(
     @Req() req: any,
     @Query('page') page?: string,
@@ -61,8 +61,29 @@ export class UsersController {
     );
   }
 
+  @Get('role-dashboard')
+  @Roles('ADMIN')
+  async getRoleDashboard(@Req() req: any) {
+    return this.usersService.getRoleDashboard(req.user.organizationId);
+  }
+
+  @Get('technicians/workload')
+  @Roles(
+    'ADMIN',
+    'CUSTOMER_MANAGER',
+    'SITE_INCHARGE',
+    'SUPERVISOR',
+  )
+  async getTechnicianWorkload(
+    @Req() req: any,
+  ) {
+    return this.usersService.getTechnicianWorkload(
+      req.user.organizationId,
+    );
+  }
+
   @Get(':id')
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER', 'SUPERVISOR')
+  @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
   async getUserById(
     @Param('id') id: string,
     @Req() req: any,
@@ -76,7 +97,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER')
+  @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
   async updateUser(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
@@ -92,7 +113,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles('ADMIN', 'MAINTENANCE_MANAGER')
+  @Roles('ADMIN', 'CUSTOMER_MANAGER', 'SITE_INCHARGE', 'SUPERVISOR')
   async deleteUser(
     @Param('id') id: string,
     @Req() req: any,
@@ -102,19 +123,6 @@ export class UsersController {
       req.user.organizationId,
       req.user.role,
       req.user.sub,
-    );
-  }
-  @Get('technicians/workload')
-  @Roles(
-    'ADMIN',
-    'MAINTENANCE_MANAGER',
-    'SUPERVISOR',
-  )
-  async getTechnicianWorkload(
-    @Req() req: any,
-  ) {
-    return this.usersService.getTechnicianWorkload(
-      req.user.organizationId,
     );
   }
 }

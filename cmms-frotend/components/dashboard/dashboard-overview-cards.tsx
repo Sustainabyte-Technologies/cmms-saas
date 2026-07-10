@@ -1,85 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { DashboardCard } from "@/components/shared/ui-components";
-import { getDashboardOverview, DashboardOverviewResponse } from "@/lib/api/dashboard-api";
-import {
-  Server,
-  ClipboardList,
-  Users,
-  AlertTriangle,
-} from "lucide-react";
+import { Zap, Coins, Target, Wallet } from "lucide-react";
 
 export function DashboardOverviewCards() {
-  const [overviewData, setOverviewData] = useState<DashboardOverviewResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchOverview = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getDashboardOverview();
-        setOverviewData(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch dashboard overview");
-        console.error("Error fetching dashboard overview:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOverview();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    console.error("Dashboard overview error:", error);
-    // Silently fail - show empty state or skip rendering
-    return null;
-  }
-
-  if (!overviewData) {
-    return null;
-  }
-
-  const { cards } = overviewData;
-
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <DashboardCard
-        title="Total Users"
-        value={cards.totalUsers.toString()}
-        icon={Users}
-        description="System users"
+        title="Energy Consumption last month"
+        value="45,200 kWh"
+        icon={Zap}
+        description="Savings: 5,400 kWh ($1,250)"
+        className="hover:shadow-md transition-all duration-300 border-emerald-500/10"
       />
       <DashboardCard
-        title="Total Assets"
-        value={cards.totalAssets.toString()}
-        icon={Server}
-        description="Registered assets"
+        title="Operation Spend"
+        value="$8,900"
+        icon={Coins}
+        description="Last Month Spend: $12,400"
+        className="hover:shadow-md transition-all duration-300 border-blue-500/10"
       />
       <DashboardCard
-        title="Work Orders"
-        value={cards.totalWorkOrders.toString()}
-        icon={ClipboardList}
-        description="All work orders"
+        title="Target Budget"
+        value="$15,000"
+        icon={Target}
+        description="Last Month Target: $14,000"
+        className="hover:shadow-md transition-all duration-300"
       />
       <DashboardCard
-        title="Open Work Orders"
-        value={cards.openWorkOrders.toString()}
-        icon={AlertTriangle}
-        description="Pending tasks"
+        title="Expense Till Now"
+        value="$68,500"
+        icon={Wallet}
+        description="Cumulative year-to-date expenditure"
+        className="hover:shadow-md transition-all duration-300"
       />
     </div>
   );

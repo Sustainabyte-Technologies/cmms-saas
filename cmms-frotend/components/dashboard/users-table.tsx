@@ -22,6 +22,7 @@ export interface User {
   role: string;
   phoneNumber?: string;
   createdBy?: string;
+  createdById?: string;
   status: "active" | "inactive" | "pending";
   joinDate: string;
 }
@@ -36,6 +37,8 @@ interface UsersTableProps {
 const roleColors: Record<string, string> = {
   admin: "bg-red-100 text-red-800",
   maintenance_manager: "bg-blue-100 text-blue-800",
+  customer_manager: "bg-blue-100 text-blue-800",
+  site_incharge: "bg-emerald-100 text-emerald-800",
   supervisor: "bg-purple-100 text-purple-800",
   technician: "bg-green-100 text-green-800",
   inventory_manager: "bg-yellow-100 text-yellow-800",
@@ -56,7 +59,8 @@ const formatRole = (role: string) => {
 };
 
 export function UsersTable({ data, caption, onEdit, onDelete }: UsersTableProps) {
-  const { role } = useRole();
+  const { role, userData } = useRole();
+  const currentUserId = userData?.id;
   
   return (
     <Table>
@@ -74,10 +78,24 @@ export function UsersTable({ data, caption, onEdit, onDelete }: UsersTableProps)
       </TableHeader>
       <TableBody>
         {data.map((user) => {
-          // Check if user was created by admin and current user is maintenance_manager
-          const isAdminCreated = user.createdBy?.toUpperCase() === "ADMIN";
-          const isMaintManager = role === "maintenance_manager";
-          const canEditDelete = !isAdminCreated || !isMaintManager;
+          let canEditDelete = false;
+          
+          if (role === "admin") {
+            canEditDelete = true;
+          } else if (role === "customer_manager") {
+            // Customer Managers can only edit/delete users they themselves created
+            canEditDelete = !!currentUserId && user.createdById === currentUserId;
+          } else if (role === "site_incharge") {
+            // Site In-Charges can only edit/delete supervisor and technician users they themselves created
+            const isTargetSupervisorOrTechnician = user.role === "supervisor" || user.role === "technician";
+            const isCreator = !!currentUserId && user.createdById === currentUserId;
+            canEditDelete = isTargetSupervisorOrTechnician && isCreator;
+          } else if (role === "supervisor") {
+            // Supervisors can only edit/delete technician users they themselves created
+            const isTargetTechnician = user.role === "technician";
+            const isCreator = !!currentUserId && user.createdById === currentUserId;
+            canEditDelete = isTargetTechnician && isCreator;
+          }
           
           return (
             <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
@@ -121,7 +139,7 @@ export function UsersTable({ data, caption, onEdit, onDelete }: UsersTableProps)
                       </Button>
                     </>
                   ) : (
-                    <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-muted rounded">Protected</span>
+                    <span className="text-xs font-medium text-muted-foreground px-2 py-1 bg-muted rounded">View Only</span>
                   )}
                 </div>
               </TableCell>
