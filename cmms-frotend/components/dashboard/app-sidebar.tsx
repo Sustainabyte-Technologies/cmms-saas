@@ -235,7 +235,7 @@ export function AppSidebar({ className }: AppSidebarProps) {
   return (
     <aside
       className={cn(
-        "sticky top-16 z-20 flex h-[calc(100vh-64px)] flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300",
+        "sticky top-20 z-20 flex h-[calc(100vh-80px)] flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300",
         collapsed ? "w-[60px]" : "w-[260px]",
         className
       )}

@@ -172,7 +172,7 @@ export function AppNavbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background px-4 lg:px-6">
+    <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border bg-background px-4 lg:px-6">
       <div className="flex items-center gap-6">
         {/* Mobile Menu Button */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -184,8 +184,8 @@ export function AppNavbar() {
           </SheetTrigger>
           <SheetContent side="left" className="w-[280px] bg-sidebar p-0">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            <div className="flex h-16 items-center border-b border-sidebar-border px-4">
-              <Logo href="/dashboard" size="md" imageSize={54} showSubtitle />
+            <div className="flex h-20 items-center border-b border-sidebar-border px-4">
+              <Logo href="/dashboard" size="lg" showSubtitle />
             </div>
             {/* Role Badge Mobile */}
             <div className="border-b border-sidebar-border px-4 py-3">
@@ -222,7 +222,7 @@ export function AppNavbar() {
 
         {/* Logo */}
         <div className="hidden lg:block">
-          <Logo href="/dashboard" size="md" imageSize={54} showSubtitle />
+          <Logo href="/dashboard" size="lg" showSubtitle />
         </div>
 
         {/* Desktop Navbar Categories */}
@@ -235,7 +235,7 @@ export function AppNavbar() {
                 key={category}
                 href={href}
                 className={cn(
-                  "relative flex items-center h-16 px-4 text-xs font-bold transition-colors uppercase tracking-wider border-b-2 border-transparent",
+                  "relative flex items-center h-20 px-4 text-xs font-bold transition-colors uppercase tracking-wider border-b-2 border-transparent",
                   isActive
                     ? "text-primary border-primary"
                     : "text-muted-foreground hover:text-foreground"

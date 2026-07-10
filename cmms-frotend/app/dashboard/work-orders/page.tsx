@@ -1615,7 +1615,6 @@ export default function WorkOrdersPage() {
                     <thead>
                       <tr className="border-b border-border bg-muted/30 font-bold text-muted-foreground">
                         <th className="py-3 px-4">WO Number</th>
-                        <th className="py-3 px-4">Title</th>
                         <th className="py-3 px-4">Asset</th>
                         <th className="py-3 px-4">Priority</th>
                         <th className="py-3 px-4">Status</th>
@@ -1635,7 +1634,6 @@ export default function WorkOrdersPage() {
                             className="border-b border-border/50 hover:bg-muted/20 cursor-pointer transition-colors"
                           >
                             <td className="py-3.5 px-4 font-bold text-primary">{wo.id}</td>
-                            <td className="py-3.5 px-4 font-semibold text-foreground">{wo.title}</td>
                             <td className="py-3.5 px-4 text-muted-foreground">{wo.asset}</td>
                             <td className="py-3.5 px-4">
                               <span className={`text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-full border uppercase ${getPriorityBadgeStyles(wo.priority)}`}>
@@ -1652,8 +1650,17 @@ export default function WorkOrdersPage() {
                             <td className="py-3.5 px-4 font-semibold text-muted-foreground">{wo.workType}</td>
                             <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                               <div className="flex items-center justify-end gap-1.5">
-                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={() => handleSelectWorkOrder(wo)}>
-                                  <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10"
+                                  onClick={() => {
+                                    handleSelectWorkOrder(wo);
+                                    setMiddleTab("chat");
+                                  }}
+                                  title="Chat about work order"
+                                >
+                                  <MessageSquare className="h-3.5 w-3.5" />
                                 </Button>
                                 {canModifyItem(role, wo.createdBy) && (
                                   <>
@@ -2818,8 +2825,8 @@ export default function WorkOrdersPage() {
                         )}
                       </TabsContent>
 
-                      {/* Chat Mobile Content (visible only on mobile/tablet) */}
-                      <TabsContent value="chat" className="pt-4 lg:hidden">
+                      {/* Chat Content (visible on all screen sizes) */}
+                      <TabsContent value="chat" className="pt-4">
                         <div className="flex flex-col h-[450px] border border-border rounded-xl overflow-hidden bg-background">
                           {/* Live Messages List */}
                           <ScrollArea className="flex-1 p-4 bg-muted/5">

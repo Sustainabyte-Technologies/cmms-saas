@@ -358,40 +358,41 @@ export default function SparePartsPage() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Part Info</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Warehouse</TableHead>
-                  <TableHead>Current Stock</TableHead>
-                  <TableHead>Unit Cost</TableHead>
-                  <TableHead className="w-[100px]"></TableHead>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-sm font-semibold text-foreground pl-6">Part Info</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Category</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Warehouse</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Current Stock</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Unit Cost</TableHead>
+                  <TableHead className="w-[100px] text-sm font-semibold text-foreground text-right pr-6">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {parts.map((part) => (
-                  <TableRow key={part.id}>
-                    <TableCell>
+                  <TableRow key={part.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="py-4 pl-6">
                       <div>
-                        <p className="font-semibold">{part.partName}</p>
+                        <p className="font-medium text-sm text-foreground">{part.partName}</p>
                         <p className="text-xs text-muted-foreground font-mono">{part.partCode}</p>
                       </div>
                     </TableCell>
-                    <TableCell>{part.category?.name || "Uncategorized"}</TableCell>
-                    <TableCell>{part.warehouse?.name || "None"}</TableCell>
-                    <TableCell>
-                      <span className={part.currentStock < part.minimumStock ? "text-destructive font-bold" : ""}>
+                    <TableCell className="text-sm py-4 text-muted-foreground">{part.category?.name || "Uncategorized"}</TableCell>
+                    <TableCell className="text-sm py-4 text-muted-foreground">{part.warehouse?.name || "None"}</TableCell>
+                    <TableCell className="text-sm py-4">
+                      <span className={part.currentStock < part.minimumStock ? "text-destructive font-bold" : "text-foreground"}>
                         {part.currentStock} {part.unit}
                       </span>
                     </TableCell>
-                    <TableCell>${part.unitCost.toFixed(2)}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild disabled={actionLoading}>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                    <TableCell className="text-sm py-4 text-muted-foreground">${part.unitCost.toFixed(2)}</TableCell>
+                    <TableCell className="py-4 pr-6">
+                      <div className="flex items-center justify-end">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild disabled={actionLoading}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 p-0 hover:bg-muted">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleOpenReceive(part)}>
                             <ArrowUpRight className="mr-2 h-4 w-4" /> Receive Stock
                           </DropdownMenuItem>
@@ -404,8 +405,9 @@ export default function SparePartsPage() {
                           <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(part)}>
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                           </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

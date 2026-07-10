@@ -160,28 +160,30 @@ export default function WarehousesPage() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Warehouse Name</TableHead>
-                  <TableHead>Address</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead className="w-[100px]"></TableHead>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="text-sm font-semibold text-foreground pl-6">Code</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Warehouse Name</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Address</TableHead>
+                  <TableHead className="text-sm font-semibold text-foreground">Description</TableHead>
+                  <TableHead className="w-[100px] text-sm font-semibold text-foreground text-right pr-6">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {warehouses.map((w) => (
-                  <TableRow key={w.id}>
-                    <TableCell className="font-mono font-semibold">{w.code}</TableCell>
-                    <TableCell className="font-semibold">{w.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{w.address || "—"}</TableCell>
-                    <TableCell className="text-muted-foreground">{w.description || "—"}</TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button size="icon" variant="ghost" onClick={() => handleOpenEdit(w)} disabled={actionLoading}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" className="text-destructive" onClick={() => handleDelete(w)} disabled={actionLoading}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                  <TableRow key={w.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="font-mono text-sm py-4 pl-6">{w.code}</TableCell>
+                    <TableCell className="font-medium text-sm py-4">{w.name}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm py-4">{w.address || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm py-4">{w.description || "—"}</TableCell>
+                    <TableCell className="py-4 pr-6">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button size="icon" variant="ghost" className="h-8 w-8 p-0 hover:bg-blue-100 hover:text-blue-600" onClick={() => handleOpenEdit(w)} disabled={actionLoading}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600" onClick={() => handleDelete(w)} disabled={actionLoading}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -33,7 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function PageSkeleton() {
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-background -m-4 lg:-m-6 overflow-hidden animate-pulse">
+    <div className="flex h-[calc(100vh-80px)] bg-background -m-4 lg:-m-6 overflow-hidden animate-pulse">
       {/* Left sidebar skeleton */}
       <div className="w-72 border-r border-border bg-card flex flex-col shrink-0 h-full p-4 space-y-4">
         <Skeleton className="h-6 w-32 rounded" />
@@ -271,7 +271,7 @@ function PortfolioContent() {
       );
     }
     return (
-      <div className="flex h-[calc(100vh-64px)] bg-background -m-4 lg:-m-6 overflow-hidden items-center justify-center p-6">
+      <div className="flex h-[calc(100vh-80px)] bg-background -m-4 lg:-m-6 overflow-hidden items-center justify-center p-6">
         <Card className="max-w-md w-full border-border">
           <CardContent className="pt-6 text-center space-y-4">
             <Building2 className="h-12 w-12 text-muted-foreground mx-auto" />
@@ -698,7 +698,7 @@ function PortfolioContent() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-background -m-4 lg:-m-6 overflow-hidden">
+    <div className="flex h-[calc(100vh-80px)] bg-background -m-4 lg:-m-6 overflow-hidden">
       {/* Sidebar Panel */}
       {sidebarElement}
 
