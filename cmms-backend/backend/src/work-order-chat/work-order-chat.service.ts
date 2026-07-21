@@ -7,7 +7,7 @@ export class WorkOrderChatService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(forwardRef(() => WorkOrderChatGateway))
-    private readonly gateway: WorkOrderChatGateway,
+    private readonly gateway: any,
   ) {}
 
   async checkWorkOrderAccess(

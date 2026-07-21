@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NAV_LINKS, APP_NAME } from "@/lib/constants";
-import { Menu, Wrench } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 export function LandingNavbar() {
@@ -82,12 +82,9 @@ export function LandingNavbar() {
                   className="flex flex-col gap-6 pt-6"
                 >
                   <div className="flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                        <Wrench className="h-5 w-5 text-primary-foreground" />
-                      </div>
-                      <span className="text-lg font-bold">{APP_NAME}</span>
-                    </Link>
+                    <div onClick={() => setIsOpen(false)}>
+                      <Logo href="/" size="md" showSubtitle={false} />
+                    </div>
                   </div>
                   <nav className="flex flex-col gap-4">
                     {NAV_LINKS.map((link, index) => (

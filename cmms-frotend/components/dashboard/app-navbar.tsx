@@ -46,6 +46,9 @@ import {
   Archive,
   FileInput,
   CheckCircle,
+  Search,
+  BookOpen,
+  FileSpreadsheet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -71,6 +74,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Archive,
   FileInput,
   CheckCircle,
+  Search,
+  BookOpen,
+  FileSpreadsheet,
 };
 
 export function AppNavbar() {
@@ -152,7 +158,8 @@ export function AppNavbar() {
     'WORK ORDERS',
     'PM',
     'INVENTORY',
-    'REPORTS'
+    'REPORTS',
+    'RELIABILITY'
   ];
   const categories = ALL_CATEGORIES.filter(category => 
     navItems.some(item => getNavItemCategory(item) === category)

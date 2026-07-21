@@ -26,7 +26,7 @@ export class WorkOrderChatGateway implements OnGatewayConnection, OnGatewayDisco
   constructor(
     private readonly jwtService: JwtService,
     @Inject(forwardRef(() => WorkOrderChatService))
-    private readonly chatService: WorkOrderChatService,
+    private readonly chatService: any,
   ) {}
 
   async handleConnection(client: Socket) {

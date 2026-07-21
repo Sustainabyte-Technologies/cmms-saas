@@ -224,6 +224,15 @@ export const ADMIN_NAV: NavItem[] = [
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
   { name: "Audit Logs", href: "/dashboard/audit-logs", icon: "FileText" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
+  { name: "Reliability Dashboard", href: "/dashboard/reliability", icon: "LayoutDashboard" },
+  { name: "Asset Criticality", href: "/dashboard/reliability/criticality", icon: "AlertTriangle" },
+  { name: "Failure Library", href: "/dashboard/reliability/failure-library", icon: "BookOpen" },
+  { name: "Failure History", href: "/dashboard/reliability/failure-history", icon: "History" },
+  { name: "Reliability KPIs", href: "/dashboard/reliability/kpis", icon: "BarChart3" },
+  { name: "Root Cause Analysis", href: "/dashboard/reliability/rca", icon: "Search" },
+  { name: "FMECA", href: "/dashboard/reliability/fmeca", icon: "Layers" },
+  { name: "RCM", href: "/dashboard/reliability/rcm", icon: "FileText" },
+  { name: "Reports", href: "/dashboard/reliability/reports", icon: "FileSpreadsheet" },
 ];
 
 // Customer Manager Navigation
@@ -243,6 +252,15 @@ export const CUSTOMER_MANAGER_NAV: NavItem[] = [
   { name: "Users", href: "/dashboard/users", icon: "Users" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
+  { name: "Reliability Dashboard", href: "/dashboard/reliability", icon: "LayoutDashboard" },
+  { name: "Asset Criticality", href: "/dashboard/reliability/criticality", icon: "AlertTriangle" },
+  { name: "Failure Library", href: "/dashboard/reliability/failure-library", icon: "BookOpen" },
+  { name: "Failure History", href: "/dashboard/reliability/failure-history", icon: "History" },
+  { name: "Reliability KPIs", href: "/dashboard/reliability/kpis", icon: "BarChart3" },
+  { name: "Root Cause Analysis", href: "/dashboard/reliability/rca", icon: "Search" },
+  { name: "FMECA", href: "/dashboard/reliability/fmeca", icon: "Layers" },
+  { name: "RCM", href: "/dashboard/reliability/rcm", icon: "FileText" },
+  { name: "Reports", href: "/dashboard/reliability/reports", icon: "FileSpreadsheet" },
 ];
 
 export const MAINTENANCE_MANAGER_NAV = CUSTOMER_MANAGER_NAV;
@@ -348,10 +366,13 @@ export const TRUST_STATS = [
   { value: "98%", label: "PM Compliance" },
 ] as const;
 
-export type NavCategory = 'DASHBOARD' | 'PORTFOLIO' | 'WORK ORDERS' | 'ASSETS' | 'PM' | 'INVENTORY' | 'REPORTS' | 'SETTINGS';
+export type NavCategory = 'DASHBOARD' | 'PORTFOLIO' | 'WORK ORDERS' | 'ASSETS' | 'PM' | 'INVENTORY' | 'REPORTS' | 'SETTINGS' | 'RELIABILITY';
 
 export const getNavItemCategory = (item: { href: string }): NavCategory => {
   const href = item.href;
+  if (href.startsWith('/dashboard/reliability')) {
+    return 'RELIABILITY';
+  }
   if (
     href === '/dashboard' ||
     href.startsWith('/dashboard/users') ||
@@ -394,6 +415,9 @@ export const getNavItemCategory = (item: { href: string }): NavCategory => {
 };
 
 export const getCategoryFromPath = (pathname: string): NavCategory => {
+  if (pathname.startsWith('/dashboard/reliability')) {
+    return 'RELIABILITY';
+  }
   if (
     pathname.startsWith('/dashboard/users') ||
     pathname.startsWith('/dashboard/roles') ||

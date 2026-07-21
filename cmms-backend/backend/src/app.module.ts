@@ -13,6 +13,7 @@ import { PreventiveMaintenanceModule } from './preventive-maintenance/preventive
 import { ChatModule } from './chat/chat.module';
 import { WorkOrderChatModule } from './work-order-chat/work-order-chat.module';
 import { InventoryModule } from './inventory/inventory.module';
+import { ReliabilityModule } from './reliability/reliability.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { InventoryModule } from './inventory/inventory.module';
     ChatModule,
     WorkOrderChatModule,
     InventoryModule,
+    ReliabilityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
