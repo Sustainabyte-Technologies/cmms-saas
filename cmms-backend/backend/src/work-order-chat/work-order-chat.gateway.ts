@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { Logger, Inject, forwardRef } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { WorkOrderChatService } from './work-order-chat.service';
 
 @WebSocketGateway({
@@ -21,13 +21,16 @@ export class WorkOrderChatGateway implements OnGatewayConnection, OnGatewayDisco
   @WebSocketServer()
   server: Server;
 
-  private readonly logger = new Logger(WorkOrderChatGateway.name);
-
   constructor(
     private readonly jwtService: JwtService,
-    @Inject(forwardRef(() => WorkOrderChatService))
-    private readonly chatService: any,
-  ) {}
+    private readonly chatService: WorkOrderChatService,
+  ) {
+    this.chatService.registerGateway(this);
+  }
+
+  private readonly logger = new Logger(WorkOrderChatGateway.name);
+
+
 
   async handleConnection(client: Socket) {
     try {
