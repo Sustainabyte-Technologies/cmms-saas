@@ -27,6 +27,22 @@ model Organization {
   spareParts             SparePart[]
   partsRequests          PartsRequest[]
   stockTransactions      StockTransaction[]
+  incidents              Incident[]
+  serviceTickets         ServiceTicket[]
+  assetCriticalities     AssetCriticality[]
+  failureLibraries       FailureLibrary[]
+  failureHistories       FailureHistory[]
+  rootCauseAnalyses      RootCauseAnalysis[]
+  fmecaAssessments       FmecaAssessment[]
+  rcmAnalyses            RcmAnalysis[]
+  reliabilityKPIs        ReliabilityKPI[]
+  reliabilityReports     ReliabilityReport[]
+  amcContracts           AMCContract[]
+  vendors                Vendor[]
+  purchaseRequests       PurchaseRequest[]
+  purchaseOrders         PurchaseOrder[]
+  goodsReceipts          GoodsReceipt[]
+  vendorInvoices         VendorInvoice[]
 
   @@map("organizations")
 }
@@ -55,6 +71,11 @@ model Customer {
   createdBy         User?        @relation("CustomerCreatedBy", fields: [createdById], references: [id])
   organization      Organization @relation(fields: [organizationId], references: [id])
   sites             Site[]
+  incidents         Incident[]
+  serviceTickets    ServiceTicket[]
+  assetCriticalities AssetCriticality[]
+  amcContracts       AMCContract[]
+  amcServiceHistories AMCServiceHistory[]
 
   @@map("customers")
 }
@@ -81,6 +102,10 @@ model Site {
   createdBy            User?        @relation("SiteCreatedBy", fields: [createdById], references: [id])
   customer             Customer     @relation(fields: [customerId], references: [id])
   organization         Organization @relation(fields: [organizationId], references: [id])
+  incidents            Incident[]
+  serviceTickets       ServiceTicket[]
+  assetCriticalities   AssetCriticality[]
+  amcContracts         AMCContract[]
 
   @@map("sites")
 }
@@ -103,6 +128,10 @@ model Department {
   site                 Site         @relation(fields: [siteId], references: [id])
   systems              System[]
   assets               Asset[]
+  incidents            Incident[]
+  serviceTickets       ServiceTicket[]
+  assetCriticalities   AssetCriticality[]
+  amcContracts         AMCContract[]
 }
 
 model Role {
@@ -153,6 +182,27 @@ model User {
   partsRequests          PartsRequest[]          @relation("PartsRequestedBy")
   approvedPartsRequests  PartsRequest[]          @relation("PartsApprovedBy")
   stockTransactions      StockTransaction[]      @relation("StockTransactionPerformer")
+  reportedIncidents      Incident[]              @relation("IncidentReporter")
+  investigatedIncidents  Incident[]              @relation("IncidentInvestigator")
+  createdIncidents       Incident[]              @relation("IncidentCreatedBy")
+  requestedTickets       ServiceTicket[]         @relation("TicketRequestedBy")
+  assignedTickets        ServiceTicket[]         @relation("TicketAssignedTo")
+  createdTickets         ServiceTicket[]         @relation("TicketCreatedBy")
+  criticalitiesReviewed  AssetCriticality[]      @relation("CriticalityReviewedBy")
+  failureHistoriesAsTech FailureHistory[]        @relation("FailureHistoryTechnician")
+  failureHistoriesAsSup  FailureHistory[]        @relation("FailureHistorySupervisor")
+  rcaInvestigated        RootCauseAnalysis[]     @relation("RcaInvestigator")
+  managedAMCContracts    AMCContract[]           @relation("AMCManager")
+  createdAMCContracts    AMCContract[]           @relation("AMCCreator")
+  amcVisits              AMCVisit[]              @relation("AMCVisitTechnician")
+  amcServiceHistories    AMCServiceHistory[]     @relation("AMCServiceTechnician")
+  renewedAMCContracts    AMCRenewal[]            @relation("AMCRenewedBy")
+  reliabilityReports     ReliabilityReport[]     @relation("ReliabilityReportGeneratedBy")
+  createdVendors         Vendor[]                @relation("VendorCreatedBy")
+  purchaseRequests       PurchaseRequest[]       @relation("PurchaseRequestedBy")
+  createdPOs             PurchaseOrder[]         @relation("POCreatedBy")
+  approvedPOs            PurchaseOrder[]         @relation("POApprovedBy")
+  goodsReceived          GoodsReceipt[]          @relation("GoodsReceivedBy")
 
   @@unique([email, organizationId])
   @@map("users")
@@ -188,6 +238,16 @@ model Asset {
   site                   Site?                   @relation(fields: [siteId], references: [id])
   system                 System?                 @relation(fields: [systemId], references: [id])
   workOrders             WorkOrder[]
+  incidents              Incident[]
+  serviceTickets         ServiceTicket[]
+  criticalities          AssetCriticality[]
+  failureHistories       FailureHistory[]
+  rootCauseAnalyses      RootCauseAnalysis[]
+  fmecaAssessments       FmecaAssessment[]
+  rcmAnalyses            RcmAnalysis[]
+  reliabilityKPIs        ReliabilityKPI[]
+  amcAssets              AMCAsset[]
+  amcServiceHistories    AMCServiceHistory[]
 
   @@map("assets")
 }
@@ -225,6 +285,8 @@ model WorkOrder {
   assignedTechnician      User?                  @relation("AssignedTechnician", fields: [assignedTechnicianId], references: [id])
   checklistTemplate       ChecklistTemplate?     @relation(fields: [checklistTemplateId], references: [id])
   createdBy               User                   @relation("WorkOrderCreatedBy", fields: [createdById], references: [id])
+  failureHistories        FailureHistory[]
+  rootCauseAnalyses       RootCauseAnalysis[]
   reviewedById            String?
   reviewedBy              User?                  @relation("ReviewedBy", fields: [reviewedById], references: [id])
   reviewedAt              DateTime?
@@ -234,6 +296,10 @@ model WorkOrder {
   workOrderMessages       WorkOrderMessage[]
   partsRequests           PartsRequest[]
   stockTransactions       StockTransaction[]
+  incident                Incident?
+  serviceTicket           ServiceTicket?
+  amcVisits               AMCVisit[]
+  amcServiceHistories     AMCServiceHistory[]
 
   @@map("work_orders")
 }
@@ -322,6 +388,7 @@ model System {
   department     Department   @relation(fields: [departmentId], references: [id])
   organization   Organization @relation(fields: [organizationId], references: [id])
   assets         Asset[]
+  assetCriticalities AssetCriticality[]
 }
 
 model ActivityLog {
@@ -490,6 +557,9 @@ model Warehouse {
   organization      Organization       @relation(fields: [organizationId], references: [id])
   spareParts        SparePart[]
   stockTransactions StockTransaction[]
+  purchaseRequests  PurchaseRequest[]
+  purchaseOrders    PurchaseOrder[]
+  goodsReceipts     GoodsReceipt[]
 
   @@map("warehouses")
 }
@@ -518,8 +588,11 @@ model SparePart {
   warehouse      Warehouse?         @relation(fields: [warehouseId], references: [id])
   organization   Organization       @relation(fields: [organizationId], references: [id])
   createdBy      User               @relation("SparePartCreatedBy", fields: [createdById], references: [id])
-  requestItems   PartsRequestItem[]
-  transactions   StockTransaction[]
+  requestItems         PartsRequestItem[]
+  transactions         StockTransaction[]
+  purchaseRequestItems PurchaseRequestItem[]
+  purchaseOrderItems   PurchaseOrderItem[]
+  goodsReceiptItems    GoodsReceiptItem[]
 
   @@map("spare_parts")
 }
@@ -596,3 +669,772 @@ enum StockTransactionType {
   ADJUSTMENT
   TRANSFER
 }
+
+// ─── Incident Management Models ─────────────────────────────────────
+
+enum IncidentType {
+  SAFETY
+  ENVIRONMENTAL
+  SECURITY
+  OPERATIONAL
+  FIRE
+  CHEMICAL
+  NEAR_MISS
+  ELECTRICAL
+  PROPERTY_DAMAGE
+  OTHER
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  UNDER_INVESTIGATION
+  CORRECTIVE_ACTION
+  RESOLVED
+  CLOSED
+}
+
+model Incident {
+  id                 String           @id @default(uuid())
+  incidentNumber     String           @unique
+  title              String
+  description        String
+  incidentType       IncidentType
+  severity           IncidentSeverity
+  status             IncidentStatus   @default(OPEN)
+  incidentDate       DateTime
+  reportedDate       DateTime         @default(now())
+  organizationId     String
+  customerId         String
+  siteId             String
+  departmentId       String
+  reportedById       String
+  assignedToId       String?
+  location           String
+  assetId            String?
+  workOrderId        String?          @unique
+  rootCause          String?
+  correctiveAction   String?
+  preventiveAction   String?
+  resolution         String?
+  remarks            String?
+  isWorkOrderCreated Boolean          @default(false)
+  closedAt           DateTime?
+  createdBy          String
+  updatedBy          String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  site         Site         @relation(fields: [siteId], references: [id])
+  department   Department   @relation(fields: [departmentId], references: [id])
+  asset        Asset?       @relation(fields: [assetId], references: [id])
+  workOrder    WorkOrder?   @relation(fields: [workOrderId], references: [id])
+  reporter     User         @relation("IncidentReporter", fields: [reportedById], references: [id])
+  investigator User?        @relation("IncidentInvestigator", fields: [assignedToId], references: [id])
+  creator      User         @relation("IncidentCreatedBy", fields: [createdBy], references: [id])
+  rootCauseAnalyses RootCauseAnalysis[]
+  failureHistories  FailureHistory[]
+
+  @@map("incidents")
+}
+
+// ─── Service Ticket Models ──────────────────────────────────────────
+
+enum TicketCategory {
+  MAINTENANCE
+  ELECTRICAL
+  MECHANICAL
+  HVAC
+  PLUMBING
+  HOUSEKEEPING
+  IT_SUPPORT
+  GENERAL_REQUEST
+  FACILITY
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  NEW
+  ASSIGNED
+  IN_PROGRESS
+  ON_HOLD
+  RESOLVED
+  CLOSED
+}
+
+model ServiceTicket {
+  id                 String         @id @default(uuid())
+  ticketNumber       String         @unique
+  title              String
+  description        String
+  category           TicketCategory
+  priority           TicketPriority
+  status             TicketStatus   @default(NEW)
+  requestDate        DateTime       @default(now())
+  organizationId     String
+  customerId         String
+  siteId             String
+  departmentId       String
+  requestedById      String
+  assignedToId       String?
+  assetId            String?
+  workOrderId        String?        @unique
+  location           String
+  resolution         String?
+  remarks            String?
+  isWorkOrderCreated Boolean        @default(false)
+  closedAt           DateTime?
+  createdBy          String
+  updatedBy          String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  site         Site         @relation(fields: [siteId], references: [id])
+  department   Department   @relation(fields: [departmentId], references: [id])
+  asset        Asset?       @relation(fields: [assetId], references: [id])
+  workOrder    WorkOrder?   @relation(fields: [workOrderId], references: [id])
+  requester    User         @relation("TicketRequestedBy", fields: [requestedById], references: [id])
+  assignee     User?        @relation("TicketAssignedTo", fields: [assignedToId], references: [id])
+  creator      User         @relation("TicketCreatedBy", fields: [createdBy], references: [id])
+  amcServiceHistories AMCServiceHistory[]
+
+  @@map("service_tickets")
+}
+
+// ─── Reliability Engineering Models ──────────────────────────────────
+
+enum CriticalityLevel {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum RcaStatus {
+  DRAFT
+  OPEN
+  INVESTIGATING
+  IN_PROGRESS
+  ACTION_REQUIRED
+  CLOSED
+}
+
+enum RcmStrategy {
+  PREVENTIVE_MAINTENANCE
+  PREDICTIVE_MAINTENANCE
+  CONDITION_MONITORING
+  INSPECTION
+  RUN_TO_FAILURE
+}
+
+enum FailureSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model AssetCriticality {
+  id                  String           @id @default(uuid())
+  organizationId      String
+  assetId             String
+  customerId          String?
+  siteId              String?
+  departmentId        String?
+  systemId            String?
+  safetyImpact        Int              @default(1)
+  productionImpact    Int              @default(1)
+  financialImpact     Int              @default(1)
+  environmentalImpact Int              @default(1)
+  maintenanceImpact   Int              @default(1)
+  criticalityScore    Int              @default(5)
+  criticalityLevel    CriticalityLevel @default(LOW)
+  reviewNotes         String?
+  reviewedById        String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  asset        Asset        @relation(fields: [assetId], references: [id])
+  customer     Customer?    @relation(fields: [customerId], references: [id])
+  site         Site?        @relation(fields: [siteId], references: [id])
+  department   Department?  @relation(fields: [departmentId], references: [id])
+  system       System?      @relation(fields: [systemId], references: [id])
+  reviewedBy   User?        @relation("CriticalityReviewedBy", fields: [reviewedById], references: [id])
+
+  @@map("asset_criticalities")
+}
+
+model FailureLibrary {
+  id                String          @id @default(uuid())
+  organizationId    String
+  failureCode       String          @unique
+  failureMode       String
+  description       String?
+  failureCategory   String
+  assetCategory     String
+  severity          FailureSeverity @default(MEDIUM)
+  recommendedAction String?
+  status            Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  organization     Organization     @relation(fields: [organizationId], references: [id])
+  failureHistories FailureHistory[]
+  fmecaAssessments FmecaAssessment[]
+
+  @@map("failure_libraries")
+}
+
+model FailureHistory {
+  id              String    @id @default(uuid())
+  organizationId  String
+  assetId         String
+  workOrderId     String?
+  incidentId      String?
+  failureModeId   String?
+  failureModeText String
+  failureCause    String
+  failureEffect   String?
+  breakdownStart  DateTime
+  breakdownEnd    DateTime?
+  downtimeHours   Float     @default(0)
+  repairTimeHours Float     @default(0)
+  technicianId    String?
+  supervisorId    String?
+  repairCost      Float     @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  asset        Asset           @relation(fields: [assetId], references: [id])
+  workOrder    WorkOrder?      @relation(fields: [workOrderId], references: [id])
+  incident     Incident?       @relation(fields: [incidentId], references: [id])
+  failureMode  FailureLibrary? @relation(fields: [failureModeId], references: [id])
+  technician   User?           @relation("FailureHistoryTechnician", fields: [technicianId], references: [id])
+  supervisor   User?           @relation("FailureHistorySupervisor", fields: [supervisorId], references: [id])
+
+  @@map("failure_histories")
+}
+
+model RootCauseAnalysis {
+  id                 String    @id @default(uuid())
+  organizationId     String
+  rcaNumber          String    @unique
+  incidentId         String?
+  assetId            String
+  workOrderId        String?
+  rootCause          String
+  causeCategory      String
+  investigationNotes String?
+  correctiveAction   String?
+  preventiveAction   String?
+  investigatorId     String?
+  status             RcaStatus @default(DRAFT)
+  closedAt           DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  asset        Asset        @relation(fields: [assetId], references: [id])
+  incident     Incident?    @relation(fields: [incidentId], references: [id])
+  workOrder    WorkOrder?   @relation(fields: [workOrderId], references: [id])
+  investigator User?        @relation("RcaInvestigator", fields: [investigatorId], references: [id])
+
+  @@map("root_cause_analyses")
+}
+
+model FmecaAssessment {
+  id                String           @id @default(uuid())
+  organizationId    String
+  assetId           String
+  failureModeId     String?
+  failureModeText   String
+  failureCause      String
+  failureEffect     String
+  severity          Int              @default(5)
+  occurrence        Int              @default(5)
+  detection         Int              @default(5)
+  rpn               Int              @default(125)
+  riskRanking       CriticalityLevel @default(MEDIUM)
+  recommendedAction String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  asset        Asset           @relation(fields: [assetId], references: [id])
+  failureMode  FailureLibrary? @relation(fields: [failureModeId], references: [id])
+
+  @@map("fmeca_assessments")
+}
+
+model RcmAnalysis {
+  id                  String      @id @default(uuid())
+  organizationId      String
+  assetId             String
+  assetFunction       String
+  functionalFailure   String
+  failureModeText     String
+  maintenanceStrategy RcmStrategy @default(PREVENTIVE_MAINTENANCE)
+  tasksDescription    String?
+  intervalDays        Int?
+  assignedRoleId      String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  asset        Asset        @relation(fields: [assetId], references: [id])
+
+  @@map("rcm_analyses")
+}
+
+// ─── AMC (Annual Maintenance Contract) Models ─────────────────────
+
+enum ContractType {
+  COMPREHENSIVE
+  NON_COMPREHENSIVE
+  LABOUR_ONLY
+  PREVENTIVE_ONLY
+}
+
+enum AMCStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  RENEWED
+}
+
+enum VisitStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  MISSED
+}
+
+model AMCContract {
+  id                String       @id @default(uuid())
+  contractNumber    String       @unique
+  contractName      String
+  organizationId    String
+  customerId        String
+  siteId            String
+  departmentId      String?
+  startDate         DateTime
+  endDate           DateTime
+  contractType      ContractType
+  status            AMCStatus    @default(DRAFT)
+  contractValue     Float
+  currency          String       @default("USD")
+  slaResponseTime   Int          @default(24)
+  slaResolutionTime Int          @default(48)
+  serviceFrequency  PMFrequency  @default(MONTHLY)
+  numberOfVisits    Int          @default(12)
+  assignedManagerId String?
+  remarks           String?
+  createdBy         String
+  updatedBy         String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  organization    Organization        @relation(fields: [organizationId], references: [id])
+  customer        Customer            @relation(fields: [customerId], references: [id])
+  site            Site                @relation(fields: [siteId], references: [id])
+  department      Department?         @relation(fields: [departmentId], references: [id])
+  assignedManager User?               @relation("AMCManager", fields: [assignedManagerId], references: [id])
+  creator         User                @relation("AMCCreator", fields: [createdBy], references: [id])
+  assets          AMCAsset[]
+  visits          AMCVisit[]
+  serviceHistories AMCServiceHistory[]
+  renewals        AMCRenewal[]        @relation("OriginalAMCContract")
+
+  @@map("amc_contracts")
+}
+
+model AMCAsset {
+  id               String      @id @default(uuid())
+  amcContractId    String
+  assetId          String
+  coverageType     String?
+  warrantyIncluded Boolean     @default(false)
+  remarks          String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  amcContract AMCContract @relation(fields: [amcContractId], references: [id], onDelete: Cascade)
+  asset       Asset       @relation(fields: [assetId], references: [id])
+
+  @@unique([amcContractId, assetId])
+  @@map("amc_assets")
+}
+
+model AMCVisit {
+  id            String      @id @default(uuid())
+  amcContractId String
+  visitDate     DateTime
+  technicianId  String?
+  visitType     String      @default("ROUTINE")
+  status        VisitStatus @default(SCHEDULED)
+  remarks       String?
+  checklist     String?
+  workOrderId   String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  amcContract AMCContract @relation(fields: [amcContractId], references: [id], onDelete: Cascade)
+  technician  User?       @relation("AMCVisitTechnician", fields: [technicianId], references: [id])
+  workOrder   WorkOrder?  @relation(fields: [workOrderId], references: [id])
+
+  @@map("amc_visits")
+}
+
+model AMCServiceHistory {
+  id              String   @id @default(uuid())
+  amcContractId   String
+  customerId      String
+  assetId         String
+  serviceTicketId String?
+  workOrderId     String?
+  technicianId    String?
+  visitDate       DateTime @default(now())
+  partsUsed       String?
+  cost            Float    @default(0)
+  remarks         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  amcContract   AMCContract    @relation(fields: [amcContractId], references: [id], onDelete: Cascade)
+  customer      Customer       @relation(fields: [customerId], references: [id])
+  asset         Asset          @relation(fields: [assetId], references: [id])
+  serviceTicket ServiceTicket? @relation(fields: [serviceTicketId], references: [id])
+  workOrder     WorkOrder?     @relation(fields: [workOrderId], references: [id])
+  technician    User?          @relation("AMCServiceTechnician", fields: [technicianId], references: [id])
+
+  @@map("amc_service_histories")
+}
+
+model AMCRenewal {
+  id                String   @id @default(uuid())
+  amcContractId     String
+  newContractId     String?
+  renewalDate       DateTime @default(now())
+  previousStartDate DateTime
+  previousEndDate   DateTime
+  newStartDate      DateTime
+  newEndDate        DateTime
+  previousValue     Float
+  newValue          Float
+  remarks           String?
+  renewedById       String
+  createdAt         DateTime @default(now())
+
+  amcContract AMCContract @relation("OriginalAMCContract", fields: [amcContractId], references: [id], onDelete: Cascade)
+  renewedBy   User        @relation("AMCRenewedBy", fields: [renewedById], references: [id])
+
+  @@map("amc_renewals")
+}
+
+// ─── Reliability Engineering Reports & KPIs ──────────────────────────
+
+model ReliabilityKPI {
+  id                   String   @id @default(uuid())
+  organizationId       String
+  assetId              String
+  period               String   @default("CURRENT")
+  mttrHours            Float    @default(0)
+  mtbfHours            Float    @default(0)
+  availabilityPercent  Float    @default(100)
+  failureRate          Float    @default(0)
+  breakdownCount       Int      @default(0)
+  totalDowntimeHours   Float    @default(0)
+  totalRepairHours     Float    @default(0)
+  totalMaintenanceCost Float    @default(0)
+  reliabilityScore     Int      @default(100)
+  calculatedAt         DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  asset        Asset        @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, assetId, period])
+  @@map("reliability_kpis")
+}
+
+model ReliabilityReport {
+  id             String   @id @default(uuid())
+  organizationId String
+  reportName     String
+  reportType     String
+  parameters     String?
+  generatedById  String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  generatedBy  User?        @relation("ReliabilityReportGeneratedBy", fields: [generatedById], references: [id])
+
+  @@map("reliability_reports")
+}
+
+// ─── Vendor Management Enums & Models ───────────────────────────────
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  BLACKLISTED
+}
+
+model Vendor {
+  id                  String       @id @default(uuid())
+  vendorCode          String       @unique
+  vendorName          String
+  vendorType          String       @default("SUPPLIER")
+  supplierCategory    String       @default("General")
+  contactPerson       String?
+  phone               String?
+  mobile              String?
+  email               String?
+  website             String?
+  gstNumber           String?
+  panNumber           String?
+  taxRegistration     String?
+  address             String?
+  city                String?
+  state               String?
+  country             String?
+  postalCode          String?
+  paymentTerms        String       @default("NET_30")
+  creditLimit         Float        @default(0)
+  leadTimeDays        Int          @default(7)
+  supportedCategories String?
+  supportedSpareParts String?
+  warrantySupport     Boolean      @default(true)
+  amcSupport          Boolean      @default(true)
+  serviceSupport      Boolean      @default(true)
+  status              VendorStatus @default(ACTIVE)
+  rating              Float        @default(5.0)
+  remarks             String?
+  attachments         String?
+  organizationId      String
+  createdById         String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  createdBy      User?           @relation("VendorCreatedBy", fields: [createdById], references: [id])
+  purchaseOrders PurchaseOrder[]
+  goodsReceipts  GoodsReceipt[]
+  invoices       VendorInvoice[]
+
+  @@map("vendors")
+}
+
+// ─── Purchase Management Enums & Models ─────────────────────────────
+
+enum PurchaseRequestStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+  CONVERTED_TO_PO
+}
+
+enum PurchaseRequestPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum PurchaseOrderStatus {
+  CREATED
+  PENDING_APPROVAL
+  APPROVED
+  SENT
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+}
+
+enum InvoicePaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+model PurchaseRequest {
+  id              String                  @id @default(uuid())
+  prNumber        String                  @unique
+  organizationId  String
+  requestedById   String
+  departmentId    String?
+  warehouseId     String?
+  priority        PurchaseRequestPriority @default(MEDIUM)
+  requiredDate    DateTime?
+  reason          String?
+  totalAmount     Float                   @default(0)
+  status          PurchaseRequestStatus   @default(PENDING)
+  approvalStep    String                  @default("STOREKEEPER")
+  rejectionReason String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  organization   Organization          @relation(fields: [organizationId], references: [id])
+  requestedBy    User                  @relation("PurchaseRequestedBy", fields: [requestedById], references: [id])
+  warehouse      Warehouse?            @relation(fields: [warehouseId], references: [id])
+  items          PurchaseRequestItem[]
+  purchaseOrders PurchaseOrder[]
+
+  @@map("purchase_requests")
+}
+
+model PurchaseRequestItem {
+  id                 String  @id @default(uuid())
+  purchaseRequestId  String
+  sparePartId        String?
+  partDescription    String
+  quantity           Int
+  unit               String  @default("Pcs")
+  estimatedUnitPrice Float   @default(0)
+  lineTotal          Float   @default(0)
+
+  purchaseRequest PurchaseRequest @relation(fields: [purchaseRequestId], references: [id], onDelete: Cascade)
+  sparePart       SparePart?       @relation(fields: [sparePartId], references: [id])
+
+  @@map("purchase_request_items")
+}
+
+model PurchaseOrder {
+  id                String              @id @default(uuid())
+  poNumber          String              @unique
+  organizationId    String
+  vendorId          String
+  purchaseRequestId String?
+  warehouseId       String?
+  orderDate         DateTime            @default(now())
+  expectedDelivery  DateTime?
+  currency          String              @default("USD")
+  tax               Float               @default(0)
+  discount          Float               @default(0)
+  shipping          Float               @default(0)
+  subtotal          Float               @default(0)
+  grandTotal        Float               @default(0)
+  status            PurchaseOrderStatus @default(CREATED)
+  createdById       String?
+  approvedById      String?
+  notes             String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  organization    Organization        @relation(fields: [organizationId], references: [id])
+  vendor          Vendor              @relation(fields: [vendorId], references: [id])
+  purchaseRequest PurchaseRequest?    @relation(fields: [purchaseRequestId], references: [id])
+  warehouse       Warehouse?          @relation(fields: [warehouseId], references: [id])
+  createdBy       User?               @relation("POCreatedBy", fields: [createdById], references: [id])
+  approvedBy      User?               @relation("POApprovedBy", fields: [approvedById], references: [id])
+  items           PurchaseOrderItem[]
+  goodsReceipts   GoodsReceipt[]
+  invoices        VendorInvoice[]
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id               String  @id @default(uuid())
+  purchaseOrderId  String
+  sparePartId      String?
+  description      String
+  quantity         Int
+  receivedQuantity Int     @default(0)
+  unit             String  @default("Pcs")
+  unitPrice        Float
+  discount         Float   @default(0)
+  tax              Float   @default(0)
+  lineTotal        Float
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  sparePart     SparePart?    @relation(fields: [sparePartId], references: [id])
+
+  @@map("purchase_order_items")
+}
+
+model GoodsReceipt {
+  id               String   @id @default(uuid())
+  grnNumber        String   @unique
+  organizationId   String
+  vendorId         String
+  purchaseOrderId  String
+  receivedDate     DateTime @default(now())
+  warehouseId      String?
+  receivedById     String?
+  receivedQuantity Int      @default(0)
+  rejectedQuantity Int      @default(0)
+  remarks          String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization  Organization       @relation(fields: [organizationId], references: [id])
+  vendor        Vendor             @relation(fields: [vendorId], references: [id])
+  purchaseOrder PurchaseOrder      @relation(fields: [purchaseOrderId], references: [id])
+  warehouse     Warehouse?         @relation(fields: [warehouseId], references: [id])
+  receivedBy    User?              @relation("GoodsReceivedBy", fields: [receivedById], references: [id])
+  items         GoodsReceiptItem[]
+
+  @@map("goods_receipts")
+}
+
+model GoodsReceiptItem {
+  id             String  @id @default(uuid())
+  goodsReceiptId String
+  sparePartId    String?
+  receivedQty    Int
+  rejectedQty    Int     @default(0)
+  unitPrice      Float   @default(0)
+  remarks        String?
+
+  goodsReceipt GoodsReceipt @relation(fields: [goodsReceiptId], references: [id], onDelete: Cascade)
+  sparePart    SparePart?   @relation(fields: [sparePartId], references: [id])
+
+  @@map("goods_receipt_items")
+}
+
+model VendorInvoice {
+  id              String               @id @default(uuid())
+  invoiceNumber   String               @unique
+  organizationId  String
+  vendorId        String
+  purchaseOrderId String?
+  invoiceDate     DateTime             @default(now())
+  invoiceAmount   Float                @default(0)
+  paymentDueDate  DateTime?
+  paymentStatus   InvoicePaymentStatus @default(PENDING)
+  paidAmount      Float                @default(0)
+  paymentDate     DateTime?
+  attachmentUrl   String?
+  remarks         String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  vendor        Vendor         @relation(fields: [vendorId], references: [id])
+  purchaseOrder PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
+
+  @@map("vendor_invoices")
+}
+
+

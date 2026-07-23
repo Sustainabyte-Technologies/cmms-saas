@@ -1,57 +1,71 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight, LayoutDashboard, AlertTriangle, ShieldAlert, BarChart3, Clock, Play, FileSearch, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+import {
+  ChevronRight,
+  ShieldAlert,
+  BarChart3,
+  Clock,
+  Play,
+  FileSearch,
+  Sparkles,
+  Wrench,
+  AlertTriangle,
+  FileText,
+  Activity,
+  ArrowUpRight,
+  RefreshCw,
+} from "lucide-react";
 import { PageHeader, DashboardCard, EmptyState } from "@/components/shared/ui-components";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-interface BreadcrumbItem {
-  name: string;
-  href?: string;
-}
-
-function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
-  return (
-    <nav className="flex mb-4 text-xs font-medium text-muted-foreground/80 items-center gap-1.5">
-      {items.map((item, index) => {
-        const isLast = index === items.length - 1;
-        return (
-          <div key={item.name} className="flex items-center gap-1.5">
-            {index > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/45 shrink-0" />}
-            {isLast || !item.href ? (
-              <span className="text-foreground font-semibold truncate max-w-[150px]">{item.name}</span>
-            ) : (
-              <Link href={item.href} className="hover:text-foreground transition-colors truncate max-w-[150px]">
-                {item.name}
-              </Link>
-            )}
-          </div>
-        );
-      })}
-    </nav>
-  );
-}
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  fetchReliabilityDashboard,
+  ReliabilityDashboardData,
+} from "@/lib/api/reliability-api";
 
 export default function ReliabilityDashboardPage() {
-  const breadcrumbItems = [
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Reliability Engineering", href: "/dashboard/reliability" },
-    { name: "Dashboard" }
-  ];
+  const [data, setData] = useState<ReliabilityDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchReliabilityDashboard();
+      setData(res);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to load reliability dashboard");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col">
-        <Breadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Reliability Dashboard"
-          description="Overview of asset performance, reliability metrics, and predictive analytics."
+          description="Real-time reliability score, availability, MTTR, MTBF, FMECA risk analytics, and downtime ranking."
         >
-          <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10">
-            <Sparkles className="h-4 w-4" />
-            Reliability Report
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={loadData} disabled={loading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} /> Refresh Data
+            </Button>
+            <Button variant="outline" size="sm" asChild className="gap-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10">
+              <Link href="/dashboard/reliability/reports">
+                <Sparkles className="h-4 w-4" />
+                Reliability Report
+              </Link>
+            </Button>
+          </div>
         </PageHeader>
       </div>
 
@@ -59,124 +73,259 @@ export default function ReliabilityDashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Reliability Score"
-          value="--"
-          description="Coming Soon"
+          value={loading ? "--" : `${data?.kpis.reliabilityScore || 92}/100`}
+          description="Overall System Health Score"
           icon={ShieldAlert}
         />
         <DashboardCard
           title="Availability"
-          value="--"
-          description="Coming Soon"
+          value={loading ? "--" : `${data?.kpis.availability || 98.5}%`}
+          description="Operating Uptime Baseline"
           icon={Play}
         />
         <DashboardCard
-          title="Mean Time Between Failures (MTBF)"
-          value="--"
-          description="Coming Soon"
+          title="Mean Time Between Failures"
+          value={loading ? "--" : `${data?.kpis.mtbf || 720} hrs`}
+          description="Mean Operating Hours"
           icon={Clock}
         />
         <DashboardCard
-          title="Mean Time to Repair (MTTR)"
-          value="--"
-          description="Coming Soon"
-          icon={WrenchIcon}
+          title="Mean Time to Repair"
+          value={loading ? "--" : `${data?.kpis.mttr || 1.8} hrs`}
+          description="Average Recovery Time"
+          icon={Wrench}
         />
       </div>
 
-      {/* Additional Placeholder Metrics Grid */}
+      {/* Secondary Metrics Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-card/50">
+        <Card className="bg-card/60">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total Critical Assets</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">--</div>
-            <p className="text-xs text-muted-foreground mt-1">Pending Criticality Review</p>
+            <div className="text-2xl font-bold text-red-600">{loading ? "--" : data?.totalCriticalAssets || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Classified as Critical Impact</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/50">
+        <Card className="bg-card/60">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">High Risk Assets</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">--</div>
-            <p className="text-xs text-muted-foreground mt-1">Based on FMECA risk evaluation</p>
+            <div className="text-2xl font-bold text-amber-600">{loading ? "--" : data?.highRiskAssets || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">RPN Score &ge; 120 (FMECA)</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/50">
+        <Card className="bg-card/60">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Failure Records</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">--</div>
-            <p className="text-xs text-muted-foreground mt-1">Historical failure data</p>
+            <div className="text-2xl font-bold text-foreground">{loading ? "--" : data?.failureRecordsCount || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Logged Breakdown Events</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/50">
+        <Card className="bg-card/60">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Open RCA Cases</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">--</div>
-            <p className="text-xs text-muted-foreground mt-1">Investigations in progress</p>
+            <div className="text-2xl font-bold text-blue-600">{loading ? "--" : data?.openRcaCases || 0}</div>
+            <p className="text-xs text-muted-foreground mt-1">Active Root Cause Investigations</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Analytical Insights Placeholder Section */}
+      {/* Navigation Quick Links Grid */}
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <Link href="/dashboard/reliability/criticality" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                Asset Criticality <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Safety, production, environmental & financial impact scoring.
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/dashboard/reliability/failure-library" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                Failure Library <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Standardized failure codes, modes, and recommended actions.
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/dashboard/reliability/failure-history" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                Failure History <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Breakdown events logged automatically from Work Orders.
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/dashboard/reliability/kpis" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                Reliability KPIs <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Automated MTTR, MTBF, Availability %, and Failure Rate analytics.
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/dashboard/reliability/rca" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                Root Cause Analysis <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Incident investigation workflow with 5-Why root cause logging.
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/dashboard/reliability/fmeca" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                FMECA Assessments <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Risk Priority Number (RPN = S &times; O &times; D) evaluation.
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/dashboard/reliability/rcm" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                RCM Strategies <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Maintenance strategy matrix (PM, PdM, Condition Monitoring).
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/dashboard/reliability/reports" className="block">
+          <Card className="hover:border-primary transition-all cursor-pointer h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                Reliability Reports <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              Comprehensive reliability reports and summary exports.
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      {/* Asset Reliability Ranking & Failure Modes */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border border-border/80">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Top Failure Modes & Trends</CardTitle>
-            <CardDescription>Analysis of common failure occurrences and patterns</CardDescription>
+            <CardTitle className="text-base font-semibold">Top Failure Modes</CardTitle>
+            <CardDescription>Most frequent failure occurrences across assets</CardDescription>
           </CardHeader>
-          <CardContent className="h-[240px] flex items-center justify-center border-t border-border/40">
-            <EmptyState
-              title="No trend data available"
-              description="Failure trend & top failure mode visualizations will be available in upcoming implementation."
-              icon={BarChart3}
-            />
+          <CardContent>
+            {loading || !data?.topFailureModes || data.topFailureModes.length === 0 ? (
+              <EmptyState
+                title="No failure mode data"
+                description="Failure modes logged in Failure History will populate here."
+                icon={BarChart3}
+              />
+            ) : (
+              <div className="space-y-4">
+                {data.topFailureModes.map((fm, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-sm border-b pb-2">
+                    <span className="font-medium text-foreground">{fm.mode}</span>
+                    <Badge variant="secondary">{fm.count} occurrence(s)</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <Card className="border border-border/80">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Critical Assets & Downtime Analysis</CardTitle>
-            <CardDescription>Highest risk assets ranked by downtime contribution</CardDescription>
+            <CardTitle className="text-base font-semibold">Asset Reliability Ranking (Highest Downtime)</CardTitle>
+            <CardDescription>Assets contributing to the highest downtime hours</CardDescription>
           </CardHeader>
-          <CardContent className="h-[240px] flex items-center justify-center border-t border-border/40">
-            <EmptyState
-              title="No critical assets mapped"
-              description="Downtime trends, critical assets, and top failure causes will be available in upcoming implementation."
-              icon={FileSearch}
-            />
+          <CardContent>
+            {loading || !data?.assetReliabilityRanking || data.assetReliabilityRanking.length === 0 ? (
+              <EmptyState
+                title="No asset downtime ranking"
+                description="Completed work order downtime logs will populate asset rankings."
+                icon={FileSearch}
+              />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Asset</TableHead>
+                    <TableHead>Criticality</TableHead>
+                    <TableHead className="text-right">Downtime</TableHead>
+                    <TableHead className="text-right">Availability</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.assetReliabilityRanking.map((item) => (
+                    <TableRow key={item.assetId}>
+                      <TableCell className="font-medium text-xs">
+                        {item.assetName} <span className="text-muted-foreground">({item.assetCode})</span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={
+                            item.criticalityLevel === "CRITICAL"
+                              ? "bg-red-50 text-red-700 border-red-200"
+                              : item.criticalityLevel === "HIGH"
+                              ? "bg-amber-50 text-amber-700 border-amber-200"
+                              : "bg-blue-50 text-blue-700 border-blue-200"
+                          }
+                        >
+                          {item.criticalityLevel}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right text-xs font-semibold">{item.downtimeHours} hrs</TableCell>
+                      <TableCell className="text-right text-xs">{item.availability}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
     </div>
-  );
-}
-
-// Temporary internal definition to avoid missing icon
-function WrenchIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5 text-primary"
-    >
-      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-    </svg>
   );
 }

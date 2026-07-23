@@ -221,6 +221,12 @@ export const ADMIN_NAV: NavItem[] = [
   { name: "Low Stock Alert", href: "/dashboard/inventory/low-stock", icon: "AlertTriangle" },
   { name: "Purchase", href: "/dashboard/purchase", icon: "ShoppingCart" },
   { name: "Vendors", href: "/dashboard/vendors", icon: "Building2" },
+  { name: "Incident Management", href: "/dashboard/incidents", icon: "ShieldAlert" },
+  { name: "Service Tickets", href: "/dashboard/service-tickets", icon: "Ticket" },
+  { name: "AMC Dashboard", href: "/dashboard/amc", icon: "LayoutDashboard" },
+  { name: "AMC Contracts", href: "/dashboard/amc/contracts", icon: "FileText" },
+  { name: "AMC Renewals", href: "/dashboard/amc/renewals", icon: "RefreshCw" },
+  { name: "AMC Reports", href: "/dashboard/amc/reports", icon: "FileSpreadsheet" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
   { name: "Audit Logs", href: "/dashboard/audit-logs", icon: "FileText" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
@@ -250,6 +256,12 @@ export const CUSTOMER_MANAGER_NAV: NavItem[] = [
   { name: "Spare Parts", href: "/dashboard/inventory/spare-parts", icon: "Wrench" },
   { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
   { name: "Users", href: "/dashboard/users", icon: "Users" },
+  { name: "Incident Management", href: "/dashboard/incidents", icon: "ShieldAlert" },
+  { name: "Service Tickets", href: "/dashboard/service-tickets", icon: "Ticket" },
+  { name: "AMC Dashboard", href: "/dashboard/amc", icon: "LayoutDashboard" },
+  { name: "AMC Contracts", href: "/dashboard/amc/contracts", icon: "FileText" },
+  { name: "AMC Renewals", href: "/dashboard/amc/renewals", icon: "RefreshCw" },
+  { name: "AMC Reports", href: "/dashboard/amc/reports", icon: "FileSpreadsheet" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
   { name: "Reliability Dashboard", href: "/dashboard/reliability", icon: "LayoutDashboard" },
@@ -284,6 +296,12 @@ export const SITE_INCHARGE_NAV: NavItem[] = [
   { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
   { name: "Stock Transactions", href: "/dashboard/inventory/transactions", icon: "History" },
   { name: "Low Stock Alert", href: "/dashboard/inventory/low-stock", icon: "AlertTriangle" },
+  { name: "Incident Management", href: "/dashboard/incidents", icon: "ShieldAlert" },
+  { name: "Service Tickets", href: "/dashboard/service-tickets", icon: "Ticket" },
+  { name: "AMC Dashboard", href: "/dashboard/amc", icon: "LayoutDashboard" },
+  { name: "AMC Contracts", href: "/dashboard/amc/contracts", icon: "FileText" },
+  { name: "AMC Renewals", href: "/dashboard/amc/renewals", icon: "RefreshCw" },
+  { name: "AMC Reports", href: "/dashboard/amc/reports", icon: "FileSpreadsheet" },
   { name: "Reports", href: "/dashboard/reports", icon: "BarChart3" },
 ];
 
@@ -296,6 +314,8 @@ export const SUPERVISOR_NAV: NavItem[] = [
   { name: "Work Order Monitoring", href: "/dashboard/work-orders", icon: "ClipboardList" },
   { name: "Parts Requests", href: "/dashboard/inventory/requests", icon: "ClipboardList" },
   { name: "Team Management", href: "/dashboard/users", icon: "Users" },
+  { name: "Incident Management", href: "/dashboard/incidents", icon: "ShieldAlert" },
+  { name: "Service Tickets", href: "/dashboard/service-tickets", icon: "Ticket" },
   { name: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];
 
@@ -366,10 +386,19 @@ export const TRUST_STATS = [
   { value: "98%", label: "PM Compliance" },
 ] as const;
 
-export type NavCategory = 'DASHBOARD' | 'PORTFOLIO' | 'WORK ORDERS' | 'ASSETS' | 'PM' | 'INVENTORY' | 'REPORTS' | 'SETTINGS' | 'RELIABILITY';
+export type NavCategory = 'DASHBOARD' | 'PORTFOLIO' | 'WORK ORDERS' | 'ASSETS' | 'PM' | 'INVENTORY' | 'INCIDENTS' | 'SERVICE TICKETS' | 'AMC MANAGEMENT' | 'REPORTS' | 'SETTINGS' | 'RELIABILITY';
 
 export const getNavItemCategory = (item: { href: string }): NavCategory => {
   const href = item.href;
+  if (href.startsWith('/dashboard/incidents')) {
+    return 'INCIDENTS';
+  }
+  if (href.startsWith('/dashboard/service-tickets')) {
+    return 'SERVICE TICKETS';
+  }
+  if (href.startsWith('/dashboard/amc')) {
+    return 'AMC MANAGEMENT';
+  }
   if (href.startsWith('/dashboard/reliability')) {
     return 'RELIABILITY';
   }
@@ -415,6 +444,15 @@ export const getNavItemCategory = (item: { href: string }): NavCategory => {
 };
 
 export const getCategoryFromPath = (pathname: string): NavCategory => {
+  if (pathname.startsWith('/dashboard/incidents')) {
+    return 'INCIDENTS';
+  }
+  if (pathname.startsWith('/dashboard/service-tickets')) {
+    return 'SERVICE TICKETS';
+  }
+  if (pathname.startsWith('/dashboard/amc')) {
+    return 'AMC MANAGEMENT';
+  }
   if (pathname.startsWith('/dashboard/reliability')) {
     return 'RELIABILITY';
   }

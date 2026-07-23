@@ -1,16 +1,15 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
 import { ReliabilityReportsService } from './reports.service';
 
 @Controller('reliability/reports')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class ReliabilityReportsController {
-  constructor(
-    private readonly reportsService: ReliabilityReportsService,
-  ) {}
+  constructor(private readonly service: ReliabilityReportsService) {}
 
   @Get()
-  async getReportsData() {
-    return this.reportsService.getReportsPlaceholder();
+  getReportsSummary(@Req() req: any) {
+    return this.service.getReportsSummary(req.user.organizationId);
   }
 }

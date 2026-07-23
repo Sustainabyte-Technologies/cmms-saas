@@ -1,0 +1,28 @@
+export enum TicketCategory {
+  MAINTENANCE = 'MAINTENANCE',
+  ELECTRICAL = 'ELECTRICAL',
+  MECHANICAL = 'MECHANICAL',
+  HVAC = 'HVAC',
+  PLUMBING = 'PLUMBING',
+  HOUSEKEEPING = 'HOUSEKEEPING',
+  IT_SUPPORT = 'IT_SUPPORT',
+  GENERAL_REQUEST = 'GENERAL_REQUEST',
+  FACILITY = 'FACILITY',
+  OTHER = 'OTHER',
+}
+
+export enum TicketPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT',
+}
+
+export enum TicketStatus {
+  NEW = 'NEW',
+  ASSIGNED = 'ASSIGNED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  ON_HOLD = 'ON_HOLD',
+  RESOLVED = 'RESOLVED',
+  CLOSED = 'CLOSED',
+}

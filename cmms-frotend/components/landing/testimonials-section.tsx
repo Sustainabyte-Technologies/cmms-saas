@@ -1,78 +1,85 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
-import { TESTIMONIALS } from "@/lib/constants";
-import { Quote } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Star, Quote, TrendingUp, Building2 } from "lucide-react";
 
 export function TestimonialsSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const testimonials = [
+    {
+      name: "Marcus Vance",
+      role: "VP of Global Maintenance Operations",
+      company: "Apex Precision Automotive",
+      quote: "FixByte AI accurately predicted a major hydraulic pump failure 8 days before our annual shutdown. We saved an estimated $210,000 in unscheduled downtime.",
+      roi: "42% Reduction in Downtime",
+      rating: 5,
+    },
+    {
+      name: "Elena Rostova",
+      role: "Director of Reliability Engineering",
+      company: "PharmaCare International",
+      quote: "The seamless integration between Spare Parts inventory and Goods Receipt (GRN) auto-stock updates transformed our storekeeper workflow. PM compliance is up to 99.2%.",
+      roi: "99.2% PM Compliance Rate",
+      rating: 5,
+    },
+    {
+      name: "David Chen",
+      role: "Head of Facility Engineering",
+      company: "Metro Health Systems",
+      quote: "Managing AMC contracts for 14 hospital buildings used to be a nightmare of lost PDFs. FixByte brought complete visibility, compliance alerts, and digital certificates.",
+      roi: "100% Audit Compliance",
+      rating: 5,
+    },
+  ];
 
   return (
-    <section className="bg-secondary py-20 lg:py-28" ref={ref}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="mx-auto max-w-2xl text-center"
-        >
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-            Testimonials
-          </p>
-          <h2 className="mt-4 text-4xl font-bold tracking-tight text-foreground">
-            Trusted by maintenance teams worldwide
+    <section id="testimonials" className="bg-slate-950 py-24 text-slate-50 border-b border-slate-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <Badge className="bg-[#54EC46]/10 text-[#54EC46] border-[#54EC46]/30 text-xs px-3 py-1 font-bold">
+            CUSTOMER SUCCESS STORIES
+          </Badge>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            Trusted By Engineering Teams At Scale
           </h2>
-        </motion.div>
+          <p className="text-slate-400 text-base sm:text-lg">
+            Discover how leading enterprises achieve operational excellence with FixByte.
+          </p>
+        </div>
 
-        {/* Testimonials Grid */}
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          {TESTIMONIALS.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 40, rotateX: 10 }}
-              animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              whileHover={{ y: -5, boxShadow: "0 10px 40px -15px rgba(0,0,0,0.2)" }}
-              className="relative rounded-2xl border border-border bg-card p-8 shadow-sm"
+        <div className="grid gap-8 lg:grid-cols-3">
+          {testimonials.map((t) => (
+            <div
+              key={t.name}
+              className="flex flex-col justify-between rounded-3xl border border-slate-800 bg-slate-900/60 p-8 shadow-xl hover:border-[#54EC46]/50 transition-colors"
             >
-              <motion.div
-                initial={{ scale: 0, rotate: -45 }}
-                animate={isInView ? { scale: 1, rotate: 0 } : {}}
-                transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
-              >
-                <Quote className="h-10 w-10 text-primary/20" />
-              </motion.div>
-              <blockquote className="mt-4">
-                <p className="text-base text-foreground leading-relaxed">
-                  &ldquo;{testimonial.quote}&rdquo;
-                </p>
-              </blockquote>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 0.4 + index * 0.1 }}
-                className="mt-6 flex items-center gap-4"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10"
-                >
-                  <span className="text-lg font-semibold text-primary">
-                    {testimonial.author.split(" ").map((n) => n[0]).join("")}
-                  </span>
-                </motion.div>
-                <div>
-                  <p className="text-lg font-semibold text-foreground">{testimonial.author}</p>
-                  <p className="text-base text-muted-foreground">
-                    {testimonial.role}, {testimonial.company}
-                  </p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-1 text-amber-400">
+                    {[...Array(t.rating)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-amber-400" />
+                    ))}
+                  </div>
+                  <Badge className="bg-[#54EC46]/10 text-[#54EC46] border-[#54EC46]/30 text-[10px]">
+                    <TrendingUp className="mr-1 h-3 w-3" /> {t.roi}
+                  </Badge>
                 </div>
-              </motion.div>
-            </motion.div>
+
+                <Quote className="h-8 w-8 text-[#54EC46]/30" />
+                <p className="text-sm text-slate-200 leading-relaxed italic">
+                  "{t.quote}"
+                </p>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/80 mt-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-[#54EC46] font-bold text-sm">
+                  {t.name.split(" ").map((n) => n[0]).join("")}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">{t.name}</p>
+                  <p className="text-xs text-slate-400">{t.role} • <span className="text-slate-300 font-semibold">{t.company}</span></p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>

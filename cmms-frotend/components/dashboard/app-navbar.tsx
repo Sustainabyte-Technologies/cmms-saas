@@ -49,6 +49,7 @@ import {
   Search,
   BookOpen,
   FileSpreadsheet,
+  ShieldAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -77,6 +78,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Search,
   BookOpen,
   FileSpreadsheet,
+  ShieldAlert,
 };
 
 export function AppNavbar() {
@@ -158,8 +160,11 @@ export function AppNavbar() {
     'WORK ORDERS',
     'PM',
     'INVENTORY',
-    'REPORTS',
-    'RELIABILITY'
+    'INCIDENTS',
+    'SERVICE TICKETS',
+    'AMC MANAGEMENT',
+    'RELIABILITY',
+    'REPORTS'
   ];
   const categories = ALL_CATEGORIES.filter(category => 
     navItems.some(item => getNavItemCategory(item) === category)

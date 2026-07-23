@@ -17,8 +17,10 @@ import { ReliabilityRcmController } from './rcm/rcm.controller';
 import { ReliabilityRcmService } from './rcm/rcm.service';
 import { ReliabilityReportsController } from './reports/reports.controller';
 import { ReliabilityReportsService } from './reports/reports.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
+  imports: [PrismaModule],
   controllers: [
     ReliabilityDashboardController,
     ReliabilityCriticalityController,

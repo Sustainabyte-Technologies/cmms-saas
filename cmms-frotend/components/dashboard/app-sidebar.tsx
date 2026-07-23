@@ -10,7 +10,7 @@ import {
   Building2, BarChart3, Settings, Wrench, ChevronLeft, ChevronRight,
   Users, Shield, FileText, CalendarClock, CheckSquare, History,
   Archive, FileInput, CheckCircle, MapPin, FolderTree, Cpu, ChevronDown,
-  ArrowLeft, Layers, MessageSquare, AlertTriangle, Search, BookOpen, FileSpreadsheet,
+  ArrowLeft, Layers, MessageSquare, AlertTriangle, Search, BookOpen, FileSpreadsheet, ShieldAlert, Ticket, RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -23,7 +23,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   LayoutDashboard, Server, ClipboardList, Calendar, Package, ShoppingCart,
   Building2, BarChart3, Settings, Users, Shield, FileText, CalendarClock,
   CheckSquare, History, Wrench, Archive, FileInput, CheckCircle, MessageSquare,
-  Layers, AlertTriangle, Search, BookOpen, FileSpreadsheet,
+  Layers, AlertTriangle, Search, BookOpen, FileSpreadsheet, ShieldAlert, Ticket, RefreshCw,
 };
 
 interface AppSidebarProps { className?: string; }

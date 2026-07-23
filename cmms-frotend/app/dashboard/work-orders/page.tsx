@@ -549,6 +549,19 @@ export default function WorkOrdersPage() {
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [showChat, setShowChat] = useState<boolean>(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState<boolean>(false);
+  const [stats, setStats] = useState<{
+    open: number;
+    inProgress: number;
+    onHold: number;
+    completed: number;
+    overdue: number;
+  }>({
+    open: 0,
+    inProgress: 0,
+    onHold: 0,
+    completed: 0,
+    overdue: 0,
+  });
   const itemsPerPage = 5;
 
   const [chatMessages, setChatMessages] = useState<any[]>([]);
@@ -797,6 +810,24 @@ export default function WorkOrdersPage() {
 
       setWorkOrders(mappedWorkOrders);
 
+      // Fetch work orders to calculate global KPI card stats fast without blocking response
+      fetchWorkOrders({ page: 1, limit: 100 })
+        .then((allRes) => {
+          const allMapped = allRes.workOrders.map(mapApiWorkOrder);
+          const now = new Date();
+          const globalStats = {
+            open: allMapped.filter((wo) => wo.status === "open").length,
+            inProgress: allMapped.filter((wo) => wo.status === "in_progress").length,
+            onHold: allMapped.filter((wo) => wo.status === "on_hold").length,
+            completed: allMapped.filter((wo) => wo.status === "completed" || wo.status === "under_review").length,
+            overdue: allMapped.filter(
+              (wo) => wo.status !== "completed" && wo.dueDateRaw && new Date(wo.dueDateRaw) < now
+            ).length,
+          };
+          setStats(globalStats);
+        })
+        .catch((err) => console.error("Error fetching global work order stats:", err));
+
       if (response.pagination) {
         setTotalPages(response.pagination.totalPages || 1);
         setTotalItems(response.pagination.total || 0);
@@ -910,15 +941,6 @@ export default function WorkOrdersPage() {
     : null;
 
   // Auto-selection of first template disabled to allow full-width table by default
-
-  // Stats Calculations
-  const stats = {
-    open: workOrders.filter((wo) => wo.status === "open").length,
-    inProgress: workOrders.filter((wo) => wo.status === "in_progress").length,
-    onHold: workOrders.filter((wo) => wo.status === "on_hold").length,
-    completed: workOrders.filter((wo) => wo.status === "completed").length,
-    overdue: workOrders.filter((wo) => wo.status === "overdue").length,
-  };
 
   // Filter logic: Handled server-side.
   const startIndex = (currentPage - 1) * itemsPerPage;

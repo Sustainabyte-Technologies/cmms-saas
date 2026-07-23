@@ -19,6 +19,8 @@ export interface UserResponse {
   createdAt: string;
 }
 
+export type User = UserResponse;
+
 export interface AuthenticatedUser {
   sub: string;
   email: string;
@@ -95,16 +97,28 @@ export async function createUser(userData: CreateUserPayload): Promise<UserRespo
  * Fetch all users from API
  * @returns Array of users or response object
  */
-export async function fetchUsers(): Promise<any> {
+export async function fetchUsers(params?: {
+  limit?: number;
+  page?: number;
+  role?: string;
+  search?: string;
+}): Promise<any> {
   try {
-    console.log("🔄 Fetching users from:", `${API_BASE_URL}/users`);
+    const queryParams = new URLSearchParams();
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.role) queryParams.append("role", params.role);
+    if (params?.search) queryParams.append("search", params.search);
 
-    const response = await fetch(`${API_BASE_URL}/users`, {
+    const url = `/users${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    console.log("🔄 Fetching users from:", `${API_BASE_URL}${url}`);
+
+    const response = await fetch(`${API_BASE_URL}${url}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Send cookies with request
+      credentials: "include",
     });
 
     console.log("📡 Response status:", response.status);
