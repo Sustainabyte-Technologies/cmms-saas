@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { Poppins } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/components/ui/sonner'
-import { FetchInterceptor } from '@/components/auth/fetch-interceptor'
 import './globals.css'
 
 const poppins = Poppins({
@@ -42,7 +41,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} bg-background`}>
       <body className="font-sans antialiased" suppressHydrationWarning>
-        <FetchInterceptor />
         {children}
         <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}

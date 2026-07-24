@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import {APP_SUBTITLE } from "@/lib/constants";
+import { APP_NAME, APP_SUBTITLE } from "@/lib/constants";
 
 interface LogoProps {
   href?: string;
@@ -48,11 +48,8 @@ export function Logo({
   const config = sizeConfig[size];
   const containerSize = imageSize || config.containerSize;
 
-  const isExternal = href.startsWith("http");
-  const LinkComponent = isExternal ? "a" : Link;
-
   return (
-    <LinkComponent href={href} className="flex items-center w-fit group select-none">
+    <Link href={href} className="flex items-center w-fit group select-none">
       <div className="flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 overflow-visible">
         <Image
           src="/logo1.png"
@@ -95,6 +92,8 @@ export function Logo({
           )}
         </div>
       )}
-    </LinkComponent>
+    </Link>
   );
 }
+
+
