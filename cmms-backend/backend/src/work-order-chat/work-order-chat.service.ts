@@ -5,9 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class WorkOrderChatService {
   private gateway: any = null;
 
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   registerGateway(gateway: any) {
     this.gateway = gateway;

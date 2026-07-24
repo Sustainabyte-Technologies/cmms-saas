@@ -13,6 +13,12 @@ import { PreventiveMaintenanceModule } from './preventive-maintenance/preventive
 import { ChatModule } from './chat/chat.module';
 import { WorkOrderChatModule } from './work-order-chat/work-order-chat.module';
 import { InventoryModule } from './inventory/inventory.module';
+import { ReliabilityModule } from './reliability/reliability.module';
+import { IncidentManagementModule } from './incident-management/incident-management.module';
+import { ServiceTicketModule } from './service-ticket/service-ticket.module';
+import { AMCModule } from './amc/amc.module';
+import { VendorsModule } from './vendors/vendors.module';
+import { PurchaseModule } from './purchase/purchase.module';
 
 @Module({
   imports: [
@@ -28,6 +34,12 @@ import { InventoryModule } from './inventory/inventory.module';
     ChatModule,
     WorkOrderChatModule,
     InventoryModule,
+    ReliabilityModule,
+    IncidentManagementModule,
+    ServiceTicketModule,
+    AMCModule,
+    VendorsModule,
+    PurchaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

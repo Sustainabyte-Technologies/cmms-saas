@@ -21,14 +21,16 @@ export class WorkOrderChatGateway implements OnGatewayConnection, OnGatewayDisco
   @WebSocketServer()
   server: Server;
 
-  private readonly logger = new Logger(WorkOrderChatGateway.name);
-
   constructor(
     private readonly jwtService: JwtService,
     private readonly chatService: WorkOrderChatService,
   ) {
     this.chatService.registerGateway(this);
   }
+
+  private readonly logger = new Logger(WorkOrderChatGateway.name);
+
+
 
   async handleConnection(client: Socket) {
     try {

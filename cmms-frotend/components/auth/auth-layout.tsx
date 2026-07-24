@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
 import { Logo } from "@/components/logo";
+import { MARKETING_WEBSITE_URL } from "@/lib/config";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -16,9 +17,11 @@ export function AuthLayout({ children, title, subtitle, showBackLink = true }: A
       <div className="hidden w-1/2 bg-gradient-to-br from-[#81C816] to-[#81C816] lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-12">
         <div className="flex flex-col items-center justify-center space-y-10 text-center">
           <div className="flex flex-col items-center gap-4">
-            <Logo href="/" size="xl" imageSize={200} showText={false} showSubtitle={false} textColor="white" />
+            <Logo href={MARKETING_WEBSITE_URL} size="xl" imageSize={200} showText={false} showSubtitle={false} textColor="white" />
             <div>
-              <h2 className="text-5xl font-bold text-white">{APP_NAME}</h2>
+              <a href={MARKETING_WEBSITE_URL} className="hover:opacity-90 transition-opacity">
+                <h2 className="text-5xl font-bold text-white">{APP_NAME}</h2>
+              </a>
             </div>
           </div>
 
@@ -42,16 +45,16 @@ export function AuthLayout({ children, title, subtitle, showBackLink = true }: A
         <div className="mx-auto w-full max-w-md">
           {/* Mobile Logo */}
           <div className="mb-8 lg:hidden">
-            <Logo href="/" size="lg" showSubtitle />
+            <Logo href={MARKETING_WEBSITE_URL} size="lg" showSubtitle />
           </div>
 
           {showBackLink && (
-            <Link
-              href="/"
+            <a
+              href={MARKETING_WEBSITE_URL}
               className="mb-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               &larr; Back to home
-            </Link>
+            </a>
           )}
 
           <div className="mb-8">

@@ -122,12 +122,6 @@ export class UsersService {
 
         const where: any = {
             organizationId,
-
-            role: {
-                name: {
-                    not: 'ADMIN',
-                },
-            },
         };
 
         if (search) {
